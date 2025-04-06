@@ -1,11 +1,11 @@
-import React from 'react';
-const ResultScreen = ({
-  score,
-  wordCount,
-  accuracy,
-  onRestart
-}) => {
-  // Determine message based on score and accuracy
+interface ResultScreenProps {
+  score: number;
+  wordCount: number;
+  accuracy: number;
+  onRestart: () => void;
+}
+
+const ResultScreen: React.FC<ResultScreenProps> = ({ score, wordCount, accuracy, onRestart }) => {
   const getMessage = () => {
     if (score >= 500 && accuracy >= 90) {
       return 'Incredible! Your typing skills are legendary!';
@@ -19,7 +19,9 @@ const ResultScreen = ({
       return "Nice try! With more practice, you'll get better!";
     }
   };
-  return <div className="max-w-md w-full text-center">
+
+  return (
+    <div className="max-w-md w-full text-center">
       <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
         Game Over!
       </h1>
@@ -40,9 +42,14 @@ const ResultScreen = ({
           </div>
         </div>
       </div>
-      <button onClick={onRestart} className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg">
+      <button
+        onClick={onRestart}
+        className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"
+      >
         Play Again
       </button>
-    </div>;
+    </div>
+  );
 };
+
 export default ResultScreen;
