@@ -1,0 +1,63 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@keyframes particle-fly-out {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(100px);
+  }
+}
+@keyframes particle-fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) translateX(-50%);
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) translateX(-50%);
+  }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+@keyframes combo-popup {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-float-up {
+  animation: float-up 1s ease-out forwards;
+}
+.animate-shake {
+  animation: shake 0.2s ease-in-out 3;
+}
+.animate-combo-popup {
+  animation: combo-popup 0.3s ease-out forwards;
+}

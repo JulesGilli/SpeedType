@@ -1,0 +1,9 @@
+import React from 'react';
+const WordDisplay = ({
+  word
+}) => {
+  return <div className="text-4xl font-mono font-bold tracking-wider bg-gray-700 py-3 px-6 rounded-lg inline-block">
+      {word}
+    </div>;
+};
+export default WordDisplay;
