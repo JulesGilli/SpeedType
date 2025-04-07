@@ -30,7 +30,9 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const [showFloatingScore, setShowFloatingScore] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [showWord, setShowWord] = useState(true);
-
+  const [wasLeet, setWasLeet] = useState(false);
+  const [wasReversed, setWasReversed] = useState(false);
+  
 
   useEffect(() => {
     generateNewWord();
@@ -60,12 +62,14 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     const word = getRandomWord();
     const includeNumbers = selectedMode === 'leet';
     const reverseWords = selectedMode === 'inversé';
-    const { modified, originalWord } = modifyWord(word, includeNumbers, reverseWords);
+    const { modified, originalWord, isLeet, isReversed } = modifyWord(word, includeNumbers, reverseWords);
 
     setCurrentWord(originalWord);
     setModifiedWord(modified);
     setUserInput('');
     setLastWordTime(Date.now());
+    setWasLeet(isLeet);
+    setWasReversed(isReversed);
 
     if (selectedMode === 'memoire') {
       setShowWord(true);
@@ -94,7 +98,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       const newComboCount = comboCount + 1;
       setComboCount(newComboCount);
 
-      const wordScore = calculateScore(modifiedWord.length, timeTaken, newComboCount);
+      const wordScore = calculateScore(modifiedWord.length, timeTaken, newComboCount, wasLeet, wasReversed);
       setScore(prev => prev + wordScore);
       setLastScore(wordScore);
       setWordsCompleted(prev => prev + 1);

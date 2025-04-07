@@ -25,7 +25,12 @@ export const modifyWord = (
   word: string,
   includeNumbers = true,
   reverseWords = true
-): { modified: string; originalWord: string } => {
+): {
+  modified: string;
+  originalWord: string;
+  isLeet: boolean;
+  isReversed: boolean;
+} => {
   const originalWord = word;
 
   const types: string[] = [];
@@ -37,6 +42,7 @@ export const modifyWord = (
 
   if (randomType === "number") {
     let modified = word;
+    let isLeet = false;
     const replacements: Record<string, string> = {
       'a': '4',
       'e': '3',
@@ -45,47 +51,47 @@ export const modifyWord = (
       's': '5',
       't': '7'
     };
-    let hasReplacement = false;
     for (const [letter, number] of Object.entries(replacements)) {
-      if (modified.includes(letter)) {
-        if (Math.random() < 0.7) {
-          modified = modified.replace(letter, number);
-          hasReplacement = true;
-        }
+      if (modified.includes(letter) && Math.random() < 0.7) {
+        modified = modified.replace(letter, number);
+        isLeet = true;
       }
     }
-    if (!hasReplacement) {
-      for (const [letter, number] of Object.entries(replacements)) {
-        if (modified.includes(letter)) {
-          modified = modified.replace(letter, number);
-          break;
-        }
-      }
-    }
-    return { modified, originalWord };
+    return { modified, originalWord, isLeet, isReversed: false };
   }
 
   if (randomType === "reverse") {
     const modified = word.split('').reverse().join('');
-    return { modified, originalWord };
+    return { modified, originalWord, isLeet: false, isReversed: true };
   }
 
-  return { modified: word, originalWord };
+  return { modified: word, originalWord, isLeet: false, isReversed: false };
 };
+
 
 // Calculate score based on word length, time taken, and combo
 export const calculateScore = (
   wordLength: number,
   timeTaken: number,
-  comboCount: number
+  comboCount: number,
+  isLeet: boolean = false,
+  isReversed: boolean = false
 ) => {
-  // Base score: longer words = more points
   let baseScore = wordLength * 5;
-  // Speed bonus: faster typing = more points
+
+  // Vitesse
   const speedMultiplier = Math.max(0.5, Math.min(3, 5 / Math.max(1, timeTaken)));
-  // Combo multiplier
+
+  // Combo
   const comboMultiplier = 1 + comboCount * 0.1;
-  // Calculate final score
-  const finalScore = Math.round(baseScore * speedMultiplier * comboMultiplier);
+
+  // Bonus si le mot est modifié
+  const leetBonus = isLeet ? 1.4 : 1;        // +40% si le mot a des chiffres
+  const reverseBonus = isReversed ? 1.4 : 1; // +40% si le mot est inversé
+
+  const finalScore = Math.round(
+    baseScore * speedMultiplier * comboMultiplier * leetBonus * reverseBonus
+  );
+
   return finalScore;
 };
