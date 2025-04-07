@@ -8,6 +8,38 @@ interface StartScreenProps {
   setSelectedMode: (mode: GameMode) => void;
 }
 
+const getModeDescription = (mode: GameMode): string[] => {
+  switch (mode) {
+    case 'classique':
+      return [
+        'Tape les mots qui s’affichent à l’écran.',
+        'Tape vite pour enchaîner les combos et gagner plus de points !',
+      ];
+    case 'leet':
+      return [
+        'Certains mots auront des chiffres à la place des lettres (E → 3, A → 4, etc).',
+        'Tape vite pour enchaîner les combos et gagner plus de points !',
+      ];
+    case 'inversé':
+      return [
+        'Certains mots seront écrits à l’envers (ex : "monde" devient "ednom").',
+        'Tape vite pour enchaîner les combos et gagner plus de points !',
+      ];
+    case 'memoire':
+      return [
+        'Les mots s’affichent brièvement puis disparaissent.',
+        'Lis-les rapidement, mémorise-les et tape-les de tête.',
+      ];
+    case 'blind':
+      return [
+        'Tu ne verras pas ce que tu tapes.',
+        'Fais confiance à ta mémoire musculaire pour réussir.',
+      ];
+    default:
+      return [];
+  }
+};
+
 const StartScreen: React.FC<StartScreenProps> = ({
   onStart,
   selectedMode,
@@ -24,22 +56,12 @@ const StartScreen: React.FC<StartScreenProps> = ({
       <div className="bg-gray-800 p-6 rounded-lg mb-8 shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Comment jouer</h2>
         <ul className="text-left space-y-2 mb-6">
-          <li className="flex items-start">
-            <span className="text-purple-400 mr-2">•</span>
-            <span>Tape les mots qui s’affichent à l’écran</span>
-          </li>
-          <li className="flex items-start">
-            <span className="text-purple-400 mr-2">•</span>
-            <span>Certains mots auront des chiffres à la place des lettres (E→3, A→4)</span>
-          </li>
-          <li className="flex items-start">
-            <span className="text-purple-400 mr-2">•</span>
-            <span>Certains mots seront à l’envers</span>
-          </li>
-          <li className="flex items-start">
-            <span className="text-purple-400 mr-2">•</span>
-            <span>Tape vite pour enchaîner les combos et gagner plus de points !</span>
-          </li>
+          {getModeDescription(selectedMode).map((line, index) => (
+            <li key={index} className="flex items-start">
+              <span className="text-purple-400 mr-2">•</span>
+              <span>{line}</span>
+            </li>
+          ))}
         </ul>
 
         <button

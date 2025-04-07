@@ -29,6 +29,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const [lastScore, setLastScore] = useState(0);
   const [showFloatingScore, setShowFloatingScore] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [showWord, setShowWord] = useState(true);
+
 
   useEffect(() => {
     generateNewWord();
@@ -56,17 +58,25 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
 
   const generateNewWord = () => {
     const word = getRandomWord();
-
-    // Ici on adapte les modifs selon le mode
     const includeNumbers = selectedMode === 'leet';
     const reverseWords = selectedMode === 'inversé';
-
     const { modified, originalWord } = modifyWord(word, includeNumbers, reverseWords);
+
     setCurrentWord(originalWord);
     setModifiedWord(modified);
     setUserInput('');
     setLastWordTime(Date.now());
+
+    if (selectedMode === 'memoire') {
+      setShowWord(true);
+      setTimeout(() => {
+        setShowWord(false);
+      }, 1500);
+    } else {
+      setShowWord(true);
+    }
   };
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserInput(e.target.value);
@@ -146,7 +156,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
               animate-combo-popup
               ${effectType === 'epic' ? 'text-pink-500 text-6xl font-bold'
                 : effectType === 'great' ? 'text-purple-500 text-5xl font-bold'
-                : 'text-blue-400 text-4xl'}
+                  : 'text-blue-400 text-4xl'}
             `}>
               {effectType === 'epic' ? 'EPIC COMBO!' : effectType === 'great' ? 'Great Combo!' : 'Good!'}
             </div>
@@ -163,7 +173,12 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
         `}>
           <div className="mb-8 text-center">
             <div className="text-sm text-gray-400 mb-2">Type this word:</div>
-            <WordDisplay word={modifiedWord} />
+            {showWord ? (
+              <WordDisplay word={modifiedWord} />
+            ) : (
+              <div className="text-2xl font-bold text-gray-500">???</div>
+            )}
+
           </div>
 
           <input
@@ -171,9 +186,10 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
             type="text"
             value={userInput}
             onChange={handleInputChange}
-            className="w-full bg-gray-700 text-white text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 hover:bg-gray-600"
-            autoFocus
+            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 hover:bg-gray-600 ${selectedMode === 'blind' ? 'text-transparent caret-white' : 'text-white'
+              }`}
           />
+
 
           <div className="mt-6 flex justify-between text-sm">
             <div>
@@ -184,7 +200,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
               <span className={`
                 ${comboCount >= 5 ? 'text-pink-400 animate-pulse font-bold'
                   : comboCount >= 3 ? 'text-purple-400 animate-pulse'
-                  : 'text-gray-400'}
+                    : 'text-gray-400'}
               `}>
                 {comboCount}x
               </span>
