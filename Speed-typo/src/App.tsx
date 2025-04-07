@@ -1,58 +1,45 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
-import ResultScreen from './components/ResultScreen';
+import { GameMode } from './types/GameMode';
 
-export function App() {
-  const [gameState, setGameState] = useState('start');
-  const [finalScore, setFinalScore] = useState(0);
-  const [wordCount, setWordCount] = useState(0);
-  const [accuracy, setAccuracy] = useState(0);
-
-  const [includeNumbers, setIncludeNumbers] = useState(true);
-  const [reverseWords, setReverseWords] = useState(true);
+function App() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedMode, setSelectedMode] = useState<GameMode>('classique');
 
   const startGame = () => {
-    setGameState('playing');
+    setIsPlaying(true);
   };
 
-  const endGame = (score: number, totalWords: number, accuracyRate: number) => {
-    setFinalScore(score);
-    setWordCount(totalWords);
-    setAccuracy(accuracyRate);
-    setGameState('result');
+  const stopGame = () => {
+    setIsPlaying(false);
   };
 
-  const restartGame = () => {
-    setGameState('start');
+  const handleGameEnd = (score: number, totalWords: number, accuracy: number) => {
+    console.log('🎮 Fin de partie !');
+    console.log('🏆 Score final :', score);
+    console.log('📝 Mots réussis :', totalWords);
+    console.log('🎯 Précision :', accuracy + '%');
+    setIsPlaying(false); // Retour à l'écran d'accueil
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
-      {gameState === 'start' && (
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
+      {!isPlaying ? (
         <StartScreen
           onStart={startGame}
-          includeNumbers={includeNumbers}
-          reverseWords={reverseWords}
-          setIncludeNumbers={setIncludeNumbers}
-          setReverseWords={setReverseWords}
+          selectedMode={selectedMode}
+          setSelectedMode={setSelectedMode}
         />
-      )}
-      {gameState === 'playing' && (
+      ) : (
         <GameScreen
-          onGameEnd={endGame}
-          includeNumbers={includeNumbers}
-          reverseWords={reverseWords}
-        />
-      )}
-      {gameState === 'result' && (
-        <ResultScreen
-          score={finalScore}
-          wordCount={wordCount}
-          accuracy={accuracy}
-          onRestart={restartGame}
+          selectedMode={selectedMode}
+          onStop={stopGame}
+          onGameEnd={handleGameEnd}
         />
       )}
     </div>
   );
 }
+
+export default App;

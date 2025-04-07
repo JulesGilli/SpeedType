@@ -1,25 +1,26 @@
 import React from 'react';
+import GameModeSelector from './GameModeSelector';
+import { GameMode } from '../types/GameMode';
 
 interface StartScreenProps {
   onStart: () => void;
-  includeNumbers: boolean;
-  reverseWords: boolean;
-  setIncludeNumbers: (value: boolean) => void;
-  setReverseWords: (value: boolean) => void;
+  selectedMode: GameMode;
+  setSelectedMode: (mode: GameMode) => void;
 }
 
 const StartScreen: React.FC<StartScreenProps> = ({
   onStart,
-  includeNumbers,
-  reverseWords,
-  setIncludeNumbers,
-  setReverseWords,
+  selectedMode,
+  setSelectedMode,
 }) => {
   return (
     <div className="max-w-md w-full text-center">
       <h1 className="text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
         Speed Typo
       </h1>
+
+      <GameModeSelector selectedMode={selectedMode} onSelectMode={setSelectedMode} />
+
       <div className="bg-gray-800 p-6 rounded-lg mb-8 shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Comment jouer</h2>
         <ul className="text-left space-y-2 mb-6">
@@ -40,29 +41,6 @@ const StartScreen: React.FC<StartScreenProps> = ({
             <span>Tape vite pour enchaîner les combos et gagner plus de points !</span>
           </li>
         </ul>
-
-        <div className="mb-6 space-y-4 text-left">
-          <label className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={includeNumbers}
-              onChange={(e) => setIncludeNumbers(e.target.checked)}
-              className="form-checkbox h-5 w-5 text-purple-500 focus:ring-pink-500 rounded"
-            />
-            <span>Inclure les chiffres dans les mots (ex: h3llo)</span>
-          </label>
-
-          <label className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={reverseWords}
-              onChange={(e) => setReverseWords(e.target.checked)}
-              className="form-checkbox h-5 w-5 text-purple-500 focus:ring-pink-500 rounded"
-            />
-            <span>Inverser certains mots (ex: dlrow)</span>
-          </label>
-        </div>
-
 
         <button
           onClick={onStart}

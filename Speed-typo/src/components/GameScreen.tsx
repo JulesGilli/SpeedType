@@ -3,16 +3,17 @@ import WordDisplay from './WordDisplay';
 import ParticleEffect from './ParticleEffect';
 import FloatingScore from './FloatingScore';
 import { getRandomWord, modifyWord, calculateScore } from '../utils/gameUtils';
+import { GameMode } from '../types/GameMode';
 
 const GAME_DURATION = 60;
 
 interface GameScreenProps {
   onGameEnd: (score: number, totalWords: number, accuracy: number) => void;
-  includeNumbers: boolean;
-  reverseWords: boolean;
+  selectedMode: GameMode;
+  onStop: () => void;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, includeNumbers, reverseWords }) => {
+const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop }) => {
   const [currentWord, setCurrentWord] = useState('');
   const [modifiedWord, setModifiedWord] = useState('');
   const [userInput, setUserInput] = useState('');
@@ -55,6 +56,11 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, includeNumbers, reve
 
   const generateNewWord = () => {
     const word = getRandomWord();
+
+    // Ici on adapte les modifs selon le mode
+    const includeNumbers = selectedMode === 'leet';
+    const reverseWords = selectedMode === 'inversé';
+
     const { modified, originalWord } = modifyWord(word, includeNumbers, reverseWords);
     setCurrentWord(originalWord);
     setModifiedWord(modified);
@@ -119,6 +125,12 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, includeNumbers, reve
             {timeLeft}s
           </span>
         </div>
+        <button
+          onClick={onStop}
+          className="text-sm px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Quitter
+        </button>
       </div>
 
       <div className={`
