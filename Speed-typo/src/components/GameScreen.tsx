@@ -32,7 +32,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const [showWord, setShowWord] = useState(true);
   const [wasLeet, setWasLeet] = useState(false);
   const [wasReversed, setWasReversed] = useState(false);
-  
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [memoryDisplayTime, setMemoryDisplayTime] = useState(1.5); 
 
   useEffect(() => {
     generateNewWord();
@@ -55,6 +56,10 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     if (timeLeft === 0) {
       const accuracy = attempts > 0 ? Math.round((wordsCompleted / attempts) * 100) : 0;
       onGameEnd(score, wordsCompleted, accuracy);
+
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
     }
   }, [timeLeft]);
 
@@ -73,17 +78,15 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
 
     if (selectedMode === 'memoire') {
       setShowWord(true);
-      setTimeout(() => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+      hideTimeoutRef.current = setTimeout(() => {
         setShowWord(false);
-      }, 1500);
+      }, memoryDisplayTime * 1000);
     } else {
       setShowWord(true);
     }
-  };
-
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserInput(e.target.value);
   };
 
   const triggerScreenShake = () => {
@@ -91,19 +94,31 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     setTimeout(() => setScreenShake(false), 500);
   };
 
-  useEffect(() => {
-    if (userInput.trim().toLowerCase() === modifiedWord.toLowerCase()) {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserInput(e.target.value);
+  };
+
+  const validateInput = () => {
+    const cleanedInput = userInput.trim().toLowerCase();
+    const cleanedTarget = modifiedWord.toLowerCase();
+  
+    if (cleanedInput === cleanedTarget) {
       const currentTime = Date.now();
       const timeTaken = (currentTime - lastWordTime) / 1000;
       const newComboCount = comboCount + 1;
       setComboCount(newComboCount);
-
+  
       const wordScore = calculateScore(modifiedWord.length, timeTaken, newComboCount, wasLeet, wasReversed);
       setScore(prev => prev + wordScore);
       setLastScore(wordScore);
       setWordsCompleted(prev => prev + 1);
       setAttempts(prev => prev + 1);
-
+  
+      // ✅ Réduction du temps d'affichage si mode mémoire
+      if (selectedMode === 'memoire') {
+        setMemoryDisplayTime(prev => Math.max(0.5, prev - 0.1));
+      }
+  
       if (newComboCount >= 5) {
         setEffectType('epic');
         setShowEffect(true);
@@ -115,17 +130,35 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
         setEffectType('good');
         setShowEffect(true);
       }
-
+  
       setShowFloatingScore(true);
       setTimeout(() => setShowFloatingScore(false), 1000);
       setTimeout(() => setShowEffect(false), 1000);
       generateNewWord();
-    } else if (userInput.length > modifiedWord.length) {
+    } else {
       setComboCount(0);
       setAttempts(prev => prev + 1);
       setUserInput('');
+  
+      // ❌ Reset du timer si on se trompe en mode mémoire
+      if (selectedMode === 'memoire') {
+        setMemoryDisplayTime(1.5);
+      }
+  
+      generateNewWord();
+    }
+  };
+  
+
+  useEffect(() => {
+    const cleanedInput = userInput.trim().toLowerCase();
+    const cleanedTarget = modifiedWord.toLowerCase();
+  
+    if (cleanedInput === cleanedTarget || userInput.length > modifiedWord.length) {
+      validateInput();
     }
   }, [userInput]);
+  
 
   return (
     <div className="max-w-2xl w-full">
@@ -182,7 +215,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
             ) : (
               <div className="text-2xl font-bold text-gray-500">???</div>
             )}
-
           </div>
 
           <input
@@ -190,10 +222,15 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
             type="text"
             value={userInput}
             onChange={handleInputChange}
-            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 hover:bg-gray-600 ${selectedMode === 'blind' ? 'text-transparent caret-white' : 'text-white'
-              }`}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                validateInput();
+              }
+            }}
+            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 hover:bg-gray-600 ${
+              selectedMode === 'blind' ? 'text-transparent caret-white' : 'text-white'
+            }`}
           />
-
 
           <div className="mt-6 flex justify-between text-sm">
             <div>
