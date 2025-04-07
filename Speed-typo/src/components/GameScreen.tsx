@@ -33,7 +33,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const [wasLeet, setWasLeet] = useState(false);
   const [wasReversed, setWasReversed] = useState(false);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [memoryDisplayTime, setMemoryDisplayTime] = useState(1.5); 
+  const [memoryDisplayTime, setMemoryDisplayTime] = useState(1.5);
+  const [wordVisibleTimeLeft, setWordVisibleTimeLeft] = useState(0);
 
   useEffect(() => {
     generateNewWord();
@@ -78,6 +79,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
 
     if (selectedMode === 'memoire') {
       setShowWord(true);
+      setWordVisibleTimeLeft(memoryDisplayTime); // initialise le temps visible
       if (hideTimeoutRef.current) {
         clearTimeout(hideTimeoutRef.current);
       }
@@ -101,24 +103,24 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const validateInput = () => {
     const cleanedInput = userInput.trim().toLowerCase();
     const cleanedTarget = modifiedWord.toLowerCase();
-  
+
     if (cleanedInput === cleanedTarget) {
       const currentTime = Date.now();
       const timeTaken = (currentTime - lastWordTime) / 1000;
       const newComboCount = comboCount + 1;
       setComboCount(newComboCount);
-  
+
       const wordScore = calculateScore(modifiedWord.length, timeTaken, newComboCount, wasLeet, wasReversed);
       setScore(prev => prev + wordScore);
       setLastScore(wordScore);
       setWordsCompleted(prev => prev + 1);
       setAttempts(prev => prev + 1);
-  
+
       // ✅ Réduction du temps d'affichage si mode mémoire
       if (selectedMode === 'memoire') {
         setMemoryDisplayTime(prev => Math.max(0.5, prev - 0.1));
       }
-  
+
       if (newComboCount >= 5) {
         setEffectType('epic');
         setShowEffect(true);
@@ -130,7 +132,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
         setEffectType('good');
         setShowEffect(true);
       }
-  
+
       setShowFloatingScore(true);
       setTimeout(() => setShowFloatingScore(false), 1000);
       setTimeout(() => setShowEffect(false), 1000);
@@ -139,26 +141,41 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       setComboCount(0);
       setAttempts(prev => prev + 1);
       setUserInput('');
-  
+
       // ❌ Reset du timer si on se trompe en mode mémoire
       if (selectedMode === 'memoire') {
         setMemoryDisplayTime(1.5);
       }
-  
+
       generateNewWord();
     }
   };
-  
+
+  useEffect(() => {
+    if (selectedMode === 'memoire' && showWord) {
+      const interval = setInterval(() => {
+        setWordVisibleTimeLeft(prev => {
+          if (prev <= 0.1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 0.1;
+        });
+      }, 100);
+
+      return () => clearInterval(interval);
+    }
+  }, [selectedMode, showWord]);
 
   useEffect(() => {
     const cleanedInput = userInput.trim().toLowerCase();
     const cleanedTarget = modifiedWord.toLowerCase();
-  
+
     if (cleanedInput === cleanedTarget || userInput.length > modifiedWord.length) {
       validateInput();
     }
   }, [userInput]);
-  
+
 
   return (
     <div className="max-w-2xl w-full">
@@ -217,6 +234,16 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
             )}
           </div>
 
+          {selectedMode === 'memoire' && showWord && (
+            <div className="w-full bg-gray-700 h-2 rounded overflow-hidden mt-4">
+              <div
+                className="bg-purple-500 h-full transition-all duration-100"
+                style={{ width: `${(wordVisibleTimeLeft / memoryDisplayTime) * 100}%` }}
+              />
+            </div>
+          )}
+
+
           <input
             ref={inputRef}
             type="text"
@@ -227,9 +254,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
                 validateInput();
               }
             }}
-            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 hover:bg-gray-600 ${
-              selectedMode === 'blind' ? 'text-transparent caret-white' : 'text-white'
-            }`}
+            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 hover:bg-gray-600 ${selectedMode === 'blind' ? 'text-transparent caret-white' : 'text-white'
+              }`}
           />
 
           <div className="mt-6 flex justify-between text-sm">
