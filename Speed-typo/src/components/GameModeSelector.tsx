@@ -18,13 +18,15 @@ const getModeLabel = (mode: GameMode) => {
       return 'Mémoire';
     case 'blind':
       return 'Blind';
+    case 'endless':
+      return 'Phrase infinie';
     default:
       return mode;
   }
 };
 
 const GameModeSelector: React.FC<GameModeSelectorProps> = ({ selectedMode, onSelectMode }) => {
-  const modes: GameMode[] = ['classique', 'inversé', 'leet', 'memoire', 'blind'];
+  const modes: GameMode[] = ['classique', 'inversé', 'leet', 'memoire', 'blind', 'endless'];
 
   return (
     <div className="flex justify-center gap-4 p-4 flex-wrap">

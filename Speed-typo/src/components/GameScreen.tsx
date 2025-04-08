@@ -4,6 +4,7 @@ import ParticleEffect from './ParticleEffect';
 import FloatingScore from './FloatingScore';
 import { getRandomWord, modifyWord, calculateScore } from '../utils/gameUtils';
 import { GameMode } from '../types/GameMode';
+import EndlessPhraseGame from './EndlessPhraseGame';
 
 const GAME_DURATION = 60;
 
@@ -14,6 +15,10 @@ interface GameScreenProps {
 }
 
 const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop }) => {
+  if (selectedMode === 'endless') {
+    return <EndlessPhraseGame onGameEnd={onGameEnd} onStop={onStop} />;
+  }
+
   const [currentWord, setCurrentWord] = useState('');
   const [modifiedWord, setModifiedWord] = useState('');
   const [userInput, setUserInput] = useState('');
@@ -35,6 +40,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [memoryDisplayTime, setMemoryDisplayTime] = useState(1.5);
   const [wordVisibleTimeLeft, setWordVisibleTimeLeft] = useState(0);
+
 
   useEffect(() => {
     generateNewWord();
