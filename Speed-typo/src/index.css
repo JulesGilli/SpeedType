@@ -61,3 +61,42 @@
 .animate-combo-popup {
   animation: combo-popup 0.3s ease-out forwards;
 }
+
+/* Mot validé qui tombe (gravité simulée par une courbe d'accélération). */
+@keyframes fall {
+  0% {
+    transform: translate(-50%, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 70vh) rotate(var(--fall-rot, 30deg));
+    opacity: 0;
+  }
+}
+.animate-fall {
+  animation: fall 1.5s cubic-bezier(0.5, 0, 1, 1) forwards;
+}
+
+/* Fond de secours avant le chargement du canvas Dither. */
+body {
+  background-color: #0f0f17;
+}
+
+/* Scrollbars dans la DA (docks classement / défis). */
+.nice-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168, 85, 247, 0.6) transparent;
+}
+.nice-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.nice-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nice-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #a855f7, #ec4899);
+  border-radius: 9999px;
+}
+.nice-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #9333ea, #db2777);
+}

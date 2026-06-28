@@ -11,7 +11,7 @@ const LeaderboardDock: React.FC = () => {
       <div className="flex flex-col rounded-t-xl sm:rounded-xl overflow-hidden shadow-2xl border border-gray-700">
         {/* Contenu : visible au-dessus de la barre quand déplié */}
         <div
-          className={`bg-gray-800 overflow-y-auto transition-all duration-300 ease-out
+          className={`bg-gray-800 overflow-y-auto nice-scroll transition-all duration-300 ease-out
             ${open ? 'max-h-[65vh] p-4' : 'max-h-0 p-0'}
           `}
         >

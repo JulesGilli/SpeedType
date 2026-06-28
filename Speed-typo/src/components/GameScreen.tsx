@@ -26,6 +26,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [comboCount, setComboCount] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
+  const [fallingWords, setFallingWords] = useState<{ id: number; text: string; left: number; rot: number }[]>([]);
+  const fallIdRef = useRef(0);
   const [showEffect, setShowEffect] = useState(false);
   const [effectType, setEffectType] = useState<'epic' | 'great' | 'good' | ''>('');
   const [wordsCompleted, setWordsCompleted] = useState(0);
@@ -126,6 +128,16 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       setComboCount(newComboCount);
       setMaxCombo(prev => Math.max(prev, newComboCount));
 
+      // Fait tomber le mot validé (effet gravité).
+      const fid = fallIdRef.current++;
+      const droppedWord = modifiedWord;
+      const left = 30 + Math.random() * 40; // 30%–70%
+      const rot = (Math.random() - 0.5) * 80; // -40°–40°
+      setFallingWords(prev => [...prev, { id: fid, text: droppedWord, left, rot }]);
+      setTimeout(() => {
+        setFallingWords(prev => prev.filter(w => w.id !== fid));
+      }, 1500);
+
       const wordScore = calculateScore(modifiedWord.length, timeTaken, newComboCount, wasLeet, wasReversed);
       setScore(prev => prev + wordScore);
       setLastScore(wordScore);
@@ -195,6 +207,20 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
 
 
   return (
+    <>
+    {/* Mots validés qui tombent (effet gravité) */}
+    <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
+      {fallingWords.map(w => (
+        <span
+          key={w.id}
+          className="absolute top-[38%] -translate-x-1/2 text-2xl font-bold text-purple-300 animate-fall whitespace-nowrap"
+          style={{ left: `${w.left}%`, ['--fall-rot' as any]: `${w.rot}deg` }}
+        >
+          {w.text}
+        </span>
+      ))}
+    </div>
+
     <div className="max-w-2xl w-full">
       <div className="flex justify-between items-center mb-8">
         <div className="text-xl font-bold">
@@ -293,6 +319,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
         </div>
       </div>
     </div>
+    </>
   );
 };
 

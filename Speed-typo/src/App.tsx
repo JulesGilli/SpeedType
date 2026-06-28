@@ -4,6 +4,7 @@ import GameScreen from './components/GameScreen';
 import ResultScreen from './components/ResultScreen';
 import LeaderboardDock from './components/LeaderboardDock';
 import ChallengesDock from './components/ChallengesDock';
+import Background from './components/Background';
 import { GameMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
@@ -52,7 +53,10 @@ function App() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
+    <div className="relative w-full min-h-screen text-white">
+      <Background />
+
+      <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-4">
       {gameState === 'start' && (
         <StartScreen
           onStart={startGame}
@@ -83,6 +87,7 @@ function App() {
           <ChallengesDock />
         </>
       )}
+      </div>
     </div>
   );
 }

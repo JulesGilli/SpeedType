@@ -9,7 +9,7 @@ const ChallengesDock: React.FC = () => {
     <div className="fixed bottom-0 left-0 sm:bottom-4 sm:left-4 z-50 w-full sm:w-96">
       <div className="flex flex-col rounded-t-xl sm:rounded-xl overflow-hidden shadow-2xl border border-gray-700">
         <div
-          className={`bg-gray-800 overflow-y-auto transition-all duration-300 ease-out
+          className={`bg-gray-800 overflow-y-auto nice-scroll transition-all duration-300 ease-out
             ${open ? 'max-h-[65vh] p-4' : 'max-h-0 p-0'}
           `}
         >
