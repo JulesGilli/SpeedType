@@ -1,59 +1,62 @@
+# 🎮 Speed Type
 
-# 🎮 Speed Typo
-
-**Speed Typo** est un jeu web de rapidité et de précision au clavier, développé en React et TypeScript. Il propose plusieurs modes de jeu originaux pour tester ta dactylographie et ton sens de l’observation. Conçu comme un serious game fun, il évolue constamment avec de nouvelles idées et mécaniques !
+**Speed Type** est un jeu web de rapidité et de précision au clavier, développé en React et TypeScript. Plusieurs modes de jeu, un classement en ligne, des défis mensuels et une interface multilingue. Conçu comme un serious game fun, il évolue constamment !
 
 👉 **Projet en cours de développement**
 
 ## 🚀 Démo
 
-Joue directement ici :  
-🔗 [https://julesgilli.github.io/SpeedType/](https://julesgilli.github.io/SpeedType/))
+Joue directement ici :
+🔗 [https://julesgilli.github.io/SpeedType/](https://julesgilli.github.io/SpeedType/)
 
 ---
 
 ## 🕹️ Fonctionnalités
 
-- ✅ Plusieurs **modes de jeu** :
-  - Mots classiques
-  - Inversés
-  - Avec chiffres
-  - Mode aveugle (texte invisible)
-  - Phrase infinie (défilement latéral)
-- ⭐️ Système de **succès à débloquer**
-- ⚡ Effets visuels et **scoring dynamique**
-- 🔊 Intégration de sons et animations de feedback
-- 📱 Interface responsive (PC / mobile)
+- ✅ Plusieurs **modes de jeu** : Classique, Inversé, Leet, Mémoire, Blind, Phrase infinie
+- 🏆 **Classements** en ligne (hebdomadaire, mensuel, tout temps) via Supabase
+- 🎯 **Défis mensuels** : 10 quêtes renouvelées chaque mois, points selon la difficulté et la précocité, classement dédié
+- 🔐 **Comptes** avec connexion Google
+- 🌍 **Multilingue** : Français, English, Español, Deutsch, Italiano
+- ✨ Fond animé (shader Dither), effets de chute des mots, écran d'intro à taper
+- ⚡ Combos, scoring dynamique et WPM en direct
 
 ---
 
 ## 🧰 Stack technique
 
-- [React](https://reactjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
+- [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
 - [TailwindCSS](https://tailwindcss.com/)
-- [Framer Motion](https://www.framer.com/motion/) pour les animations
+- [Framer Motion](https://www.framer.com/motion/) (animations)
+- [three.js](https://threejs.org/) / React Three Fiber (fond animé)
+- [Supabase](https://supabase.com/) (auth, base de données, classements, défis)
 
 ---
 
 ## 🛠️ Installation
 
+> ⚠️ Le code de l'application se trouve dans le sous-dossier **`Speed-typo/`**.
+
 ```bash
 # 1. Clone le dépôt
-git clone https://github.com/JulesGilli/julesgilli-speedtype.git
+git clone https://github.com/JulesGilli/SpeedType.git
 
-# 2. Va dans le dossier
-cd julesgilli-speedtype
+# 2. Va dans le dossier de l'app
+cd SpeedType/Speed-typo
 
 # 3. Installe les dépendances
 npm install
 
-# 4. Lance le serveur local
+# 4. Configure les variables d'environnement
+cp .env.example .env.local
+# puis renseigne VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY
+
+# 5. Lance le serveur local
 npm run dev
 ```
 
-Le jeu sera accessible sur [http://localhost:5173](http://localhost:5173)
+Le jeu sera accessible sur [http://localhost:5173/SpeedType/](http://localhost:5173/SpeedType/)
 
 ---
 
@@ -61,29 +64,26 @@ Le jeu sera accessible sur [http://localhost:5173](http://localhost:5173)
 
 ```
 .
-├── public/               # Images et GIFs
-├── src/
-│   ├── components/       # Composants React
-│   ├── data/             # Mots, succès, etc.
-│   ├── logic/            # Logique de jeu
-│   └── styles/           # Fichiers de style
-├── App.tsx
-├── main.tsx
-└── ...
+├── .github/workflows/    # CI/CD : déploiement GitHub Pages
+└── Speed-typo/           # Application
+    ├── src/
+    │   ├── components/    # Composants React
+    │   ├── lib/           # Supabase, auth, i18n, accès données
+    │   ├── types/         # Types partagés
+    │   └── utils/         # Logique de jeu
+    └── supabase/
+        └── migrations/    # Schéma de la base (tables, RLS, fonctions)
 ```
 
 ---
 
-## 🧪 Prochaines améliorations
+## ☁️ Déploiement
 
-- [ ] Classement local / leaderboard
-- [ ] Export de la progression
-- [ ] Plus de succès et challenges
-- [ ] Accessibilité et options clavier
+Le site est déployé automatiquement sur **GitHub Pages** via **GitHub Actions** à chaque push sur `main` (voir [.github/workflows/deploy.yml](.github/workflows/deploy.yml)). La base de données est gérée par migrations Supabase.
 
 ---
 
-## 🙌 Auteurs
+## 🙌 Auteur
 
-Développé en solo par **Jules GILLI**  
+Développé par **Jules GILLI**
 📫 [linkedin.com/in/julesgilli](https://linkedin.com/in/julesgilli)

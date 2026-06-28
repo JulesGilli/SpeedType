@@ -1,0 +1,56 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul déploiement à la fois.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Speed-typo
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Speed-typo/package-lock.json
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+        # Clés Supabase publiques (anon) : exposées par design côté client,
+        # la sécurité repose sur les règles RLS de la base. On peut les déplacer
+        # en "Repository secrets" (vars.* / secrets.*) plus tard si souhaité.
+        env:
+          VITE_SUPABASE_URL: https://iyrsaoqeasqulkgtdhyt.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5cnNhb3FlYXNxdWxrZ3RkaHl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2Mjc2NjksImV4cCI6MjA5ODIwMzY2OX0.fPdOy3SN-m6GQZfDaRndCqQvrN9sgjNCXya0Kxh2CNU
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: Speed-typo/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
