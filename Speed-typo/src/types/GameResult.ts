@@ -9,5 +9,6 @@ export interface GameResult {
   wordCount: number;
   accuracy: number; // pourcentage 0-100
   wpm: number; // mots par minute (chars corrects / 5 / minutes)
+  maxCombo: number; // plus long combo de la partie
   durationSec: number;
 }

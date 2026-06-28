@@ -1,9 +1,11 @@
 import { GameResult } from '../types/GameResult';
 import { SaveStatus } from '../App';
+import { ClaimedChallenge } from '../lib/challenges';
 
 interface ResultScreenProps {
   result: GameResult;
   saveStatus: SaveStatus;
+  claimed: ClaimedChallenge[];
   onRestart: () => void;
 }
 
@@ -20,7 +22,7 @@ const SaveStatusLine: React.FC<{ status: SaveStatus }> = ({ status }) => {
   return <p className={`text-sm mb-4 ${entry.className}`}>{entry.text}</p>;
 };
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onRestart }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed, onRestart }) => {
   const { score, wordCount, accuracy, wpm } = result;
 
   const getMessage = () => {
@@ -64,6 +66,23 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onResta
           </div>
         </div>
       </div>
+
+      {claimed.length > 0 && (
+        <div className="bg-gray-800 p-4 rounded-lg mb-8 shadow-lg border border-green-500/40">
+          <div className="text-sm font-semibold text-green-400 mb-2">
+            {claimed.length === 1 ? 'Défi validé !' : `${claimed.length} défis validés !`}
+          </div>
+          <ul className="space-y-1">
+            {claimed.map((c) => (
+              <li key={c.challenge_id} className="flex justify-between text-sm">
+                <span className="text-gray-200">{c.title}</span>
+                <span className="text-purple-400 font-semibold">+{c.points_earned} pts</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <button
         onClick={onRestart}
         className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"

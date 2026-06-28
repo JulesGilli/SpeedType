@@ -11,6 +11,7 @@ export async function submitScore(result: GameResult, userId: string) {
     wpm: result.wpm,
     accuracy: result.accuracy,
     word_count: result.wordCount,
+    max_combo: result.maxCombo,
   });
 
   if (error) {

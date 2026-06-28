@@ -25,6 +25,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [comboCount, setComboCount] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
   const [showEffect, setShowEffect] = useState(false);
   const [effectType, setEffectType] = useState<'epic' | 'great' | 'good' | ''>('');
   const [wordsCompleted, setWordsCompleted] = useState(0);
@@ -69,6 +70,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
         wordCount: wordsCompleted,
         accuracy,
         wpm: computeWpm(correctChars, GAME_DURATION),
+        maxCombo,
         durationSec: GAME_DURATION,
       });
 
@@ -122,6 +124,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       const timeTaken = (currentTime - lastWordTime) / 1000;
       const newComboCount = comboCount + 1;
       setComboCount(newComboCount);
+      setMaxCombo(prev => Math.max(prev, newComboCount));
 
       const wordScore = calculateScore(modifiedWord.length, timeTaken, newComboCount, wasLeet, wasReversed);
       setScore(prev => prev + wordScore);

@@ -75,6 +75,7 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
                 wordCount: wordsTyped,
                 accuracy,
                 wpm: computeWpm(index, 60),
+                maxCombo: 0,
                 durationSec: 60,
             });
         }
