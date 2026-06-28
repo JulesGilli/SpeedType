@@ -1,66 +1,55 @@
-# 🎮 Speed Type
+# SpeedType
 
-**Speed Type** est un jeu web de rapidité et de précision au clavier, développé en React et TypeScript. Plusieurs modes de jeu, un classement en ligne, des défis mensuels et une interface multilingue. Conçu comme un serious game fun, il évolue constamment !
+SpeedType est un jeu web de rapidité et de précision au clavier, développé en React et TypeScript. Il propose plusieurs modes de jeu, un classement en ligne, des défis mensuels et une interface multilingue. Projet personnel en développement continu.
 
-👉 **Projet en cours de développement**
+## Démo
 
-## 🚀 Démo
+Jouer en ligne : [julesgilli.github.io/SpeedType](https://julesgilli.github.io/SpeedType/)
 
-Joue directement ici :
-🔗 [https://julesgilli.github.io/SpeedType/](https://julesgilli.github.io/SpeedType/)
+## Fonctionnalités
 
----
+- **Modes de jeu** : Classique, Inversé, Leet, Mémoire, Blind, Phrase infinie
+- **Classements en ligne** : hebdomadaire, mensuel et tout temps, gérés via Supabase
+- **Défis mensuels** : 10 quêtes renouvelées chaque mois, points attribués selon la difficulté et la précocité, avec un classement dédié
+- **Comptes utilisateurs** : connexion via Google (OAuth)
+- **Multilingue** : Français, English, Español, Deutsch, Italiano
+- **Interface animée** : fond shader (Dither), chute des mots validés, écran d'introduction interactif
+- **Scoring temps réel** : combos, score dynamique et WPM en direct
 
-## 🕹️ Fonctionnalités
+## Stack technique
 
-- ✅ Plusieurs **modes de jeu** : Classique, Inversé, Leet, Mémoire, Blind, Phrase infinie
-- 🏆 **Classements** en ligne (hebdomadaire, mensuel, tout temps) via Supabase
-- 🎯 **Défis mensuels** : 10 quêtes renouvelées chaque mois, points selon la difficulté et la précocité, classement dédié
-- 🔐 **Comptes** avec connexion Google
-- 🌍 **Multilingue** : Français, English, Español, Deutsch, Italiano
-- ✨ Fond animé (shader Dither), effets de chute des mots, écran d'intro à taper
-- ⚡ Combos, scoring dynamique et WPM en direct
+- [React](https://reactjs.org/) et [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/) pour le build et le serveur de développement
+- [TailwindCSS](https://tailwindcss.com/) pour le style
+- [Framer Motion](https://www.framer.com/motion/) pour les animations
+- [three.js](https://threejs.org/) et React Three Fiber pour le fond animé
+- [Supabase](https://supabase.com/) pour l'authentification, la base de données, les classements et les défis
 
----
+## Installation
 
-## 🧰 Stack technique
-
-- [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
-- [Vite](https://vitejs.dev/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [Framer Motion](https://www.framer.com/motion/) (animations)
-- [three.js](https://threejs.org/) / React Three Fiber (fond animé)
-- [Supabase](https://supabase.com/) (auth, base de données, classements, défis)
-
----
-
-## 🛠️ Installation
-
-> ⚠️ Le code de l'application se trouve dans le sous-dossier **`Speed-typo/`**.
+Le code de l'application se trouve dans le sous-dossier `Speed-typo/`.
 
 ```bash
-# 1. Clone le dépôt
+# 1. Cloner le dépôt
 git clone https://github.com/JulesGilli/SpeedType.git
 
-# 2. Va dans le dossier de l'app
+# 2. Se placer dans le dossier de l'application
 cd SpeedType/Speed-typo
 
-# 3. Installe les dépendances
+# 3. Installer les dépendances
 npm install
 
-# 4. Configure les variables d'environnement
+# 4. Configurer les variables d'environnement
 cp .env.example .env.local
-# puis renseigne VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY
+# puis renseigner VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY
 
-# 5. Lance le serveur local
+# 5. Lancer le serveur de développement
 npm run dev
 ```
 
-Le jeu sera accessible sur [http://localhost:5173/SpeedType/](http://localhost:5173/SpeedType/)
+L'application est accessible sur [http://localhost:5173/SpeedType/](http://localhost:5173/SpeedType/).
 
----
-
-## 📂 Structure du projet
+## Structure du projet
 
 ```
 .
@@ -75,15 +64,10 @@ Le jeu sera accessible sur [http://localhost:5173/SpeedType/](http://localhost:5
         └── migrations/    # Schéma de la base (tables, RLS, fonctions)
 ```
 
----
+## Déploiement
 
-## ☁️ Déploiement
+Le site est déployé automatiquement sur GitHub Pages via GitHub Actions à chaque push sur `main` (voir [.github/workflows/deploy.yml](.github/workflows/deploy.yml)). La base de données est gérée par migrations Supabase.
 
-Le site est déployé automatiquement sur **GitHub Pages** via **GitHub Actions** à chaque push sur `main` (voir [.github/workflows/deploy.yml](.github/workflows/deploy.yml)). La base de données est gérée par migrations Supabase.
+## Auteur
 
----
-
-## 🙌 Auteur
-
-Développé par **Jules GILLI**
-📫 [linkedin.com/in/julesgilli](https://linkedin.com/in/julesgilli)
+Développé par Jules GILLI — [linkedin.com/in/julesgilli](https://linkedin.com/in/julesgilli)
