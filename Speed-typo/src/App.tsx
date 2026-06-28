@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import IntroGate from './components/IntroGate';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import ResultScreen from './components/ResultScreen';
@@ -21,6 +23,7 @@ function App() {
   const [claimed, setClaimed] = useState<ClaimedChallenge[]>([]);
 
   const [selectedMode, setSelectedMode] = useState<GameMode>('classique');
+  const [unlocked, setUnlocked] = useState(false);
   const [bgEnabled, setBgEnabled] = useState<boolean>(
     () => localStorage.getItem('st_bg_enabled') !== 'false'
   );
@@ -65,7 +68,17 @@ function App() {
     <div className="relative w-full min-h-screen text-white">
       <Background enabled={bgEnabled} />
 
-      <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-4">
+      <AnimatePresence mode="wait">
+        {!unlocked ? (
+          <IntroGate key="intro" onUnlock={() => setUnlocked(true)} />
+        ) : (
+          <motion.div
+            key="app"
+            className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-4"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
       {gameState === 'start' && (
         <StartScreen
           onStart={startGame}
@@ -97,7 +110,9 @@ function App() {
           <ChallengesDock />
         </>
       )}
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
