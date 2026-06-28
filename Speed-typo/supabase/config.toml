@@ -1,0 +1,4 @@
+# Configuration Supabase CLI (utilisée par l'intégration GitHub).
+# project_id est un identifiant local ; le vrai projet lié est configuré
+# dans le dashboard Supabase (GitHub Integration).
+project_id = "speedtype"

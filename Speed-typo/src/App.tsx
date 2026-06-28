@@ -3,12 +3,11 @@ import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import ResultScreen from './components/ResultScreen';
 import { GameMode } from './types/GameMode';
+import { GameResult } from './types/GameResult';
 
 function App() {
   const [gameState, setGameState] = useState<'start' | 'playing' | 'result'>('start');
-  const [finalScore, setFinalScore] = useState(0);
-  const [wordCount, setWordCount] = useState(0);
-  const [accuracy, setAccuracy] = useState(0);
+  const [result, setResult] = useState<GameResult | null>(null);
 
   const [selectedMode, setSelectedMode] = useState<GameMode>('classique');
 
@@ -16,10 +15,8 @@ function App() {
     setGameState('playing');
   };
 
-  const endGame = (score: number, totalWords: number, accuracyRate: number) => {
-    setFinalScore(score);
-    setWordCount(totalWords);
-    setAccuracy(accuracyRate);
+  const endGame = (gameResult: GameResult) => {
+    setResult(gameResult);
     setGameState('result');
   };
 
@@ -43,13 +40,8 @@ function App() {
           onGameEnd={endGame}
         />
       )}
-      {gameState === 'result' && (
-        <ResultScreen
-          score={finalScore}
-          wordCount={wordCount}
-          accuracy={accuracy}
-          onRestart={restartGame}
-        />
+      {gameState === 'result' && result && (
+        <ResultScreen result={result} onRestart={restartGame} />
       )}
     </div>
   );

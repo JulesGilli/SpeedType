@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { GameResult } from '../types/GameResult';
+import { computeWpm } from '../utils/gameUtils';
 
 interface EndlessPhraseGameProps {
-    onGameEnd: (score: number, totalWords: number, accuracy: number) => void;
+    onGameEnd: (result: GameResult) => void;
     onStop: () => void;
 }
 
@@ -67,7 +69,14 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
             const wordsTyped = Math.floor(index / avgWordLength);
             const accuracy = 100;
 
-            onGameEnd(meters, wordsTyped, accuracy);
+            onGameEnd({
+                mode: 'endless',
+                score: Math.round(meters),
+                wordCount: wordsTyped,
+                accuracy,
+                wpm: computeWpm(index, 60),
+                durationSec: 60,
+            });
         }
     }, [timeLeft]);
 

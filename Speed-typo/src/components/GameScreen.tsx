@@ -2,14 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import WordDisplay from './WordDisplay';
 import ParticleEffect from './ParticleEffect';
 import FloatingScore from './FloatingScore';
-import { getRandomWord, modifyWord, calculateScore } from '../utils/gameUtils';
+import { getRandomWord, modifyWord, calculateScore, computeWpm } from '../utils/gameUtils';
 import { GameMode } from '../types/GameMode';
+import { GameResult } from '../types/GameResult';
 import EndlessPhraseGame from './EndlessPhraseGame';
 
 const GAME_DURATION = 60;
 
 interface GameScreenProps {
-  onGameEnd: (score: number, totalWords: number, accuracy: number) => void;
+  onGameEnd: (result: GameResult) => void;
   selectedMode: GameMode;
   onStop: () => void;
 }
@@ -19,7 +20,6 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     return <EndlessPhraseGame onGameEnd={onGameEnd} onStop={onStop} />;
   }
 
-  const [currentWord, setCurrentWord] = useState('');
   const [modifiedWord, setModifiedWord] = useState('');
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState(0);
@@ -28,6 +28,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   const [showEffect, setShowEffect] = useState(false);
   const [effectType, setEffectType] = useState<'epic' | 'great' | 'good' | ''>('');
   const [wordsCompleted, setWordsCompleted] = useState(0);
+  const [correctChars, setCorrectChars] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [lastWordTime, setLastWordTime] = useState(Date.now());
   const [screenShake, setScreenShake] = useState(false);
@@ -62,7 +63,14 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   useEffect(() => {
     if (timeLeft === 0) {
       const accuracy = attempts > 0 ? Math.round((wordsCompleted / attempts) * 100) : 0;
-      onGameEnd(score, wordsCompleted, accuracy);
+      onGameEnd({
+        mode: selectedMode,
+        score,
+        wordCount: wordsCompleted,
+        accuracy,
+        wpm: computeWpm(correctChars, GAME_DURATION),
+        durationSec: GAME_DURATION,
+      });
 
       if (hideTimeoutRef.current) {
         clearTimeout(hideTimeoutRef.current);
@@ -74,9 +82,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     const word = getRandomWord();
     const includeNumbers = selectedMode === 'leet';
     const reverseWords = selectedMode === 'inversé';
-    const { modified, originalWord, isLeet, isReversed } = modifyWord(word, includeNumbers, reverseWords);
+    const { modified, isLeet, isReversed } = modifyWord(word, includeNumbers, reverseWords);
 
-    setCurrentWord(originalWord);
     setModifiedWord(modified);
     setUserInput('');
     setLastWordTime(Date.now());
@@ -120,6 +127,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       setScore(prev => prev + wordScore);
       setLastScore(wordScore);
       setWordsCompleted(prev => prev + 1);
+      setCorrectChars(prev => prev + modifiedWord.length);
       setAttempts(prev => prev + 1);
 
       // ✅ Réduction du temps d'affichage si mode mémoire

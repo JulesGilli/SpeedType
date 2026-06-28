@@ -1,11 +1,13 @@
+import { GameResult } from '../types/GameResult';
+
 interface ResultScreenProps {
-  score: number;
-  wordCount: number;
-  accuracy: number;
+  result: GameResult;
   onRestart: () => void;
 }
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ score, wordCount, accuracy, onRestart }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ result, onRestart }) => {
+  const { score, wordCount, accuracy, wpm } = result;
+
   const getMessage = () => {
     if (score >= 500 && accuracy >= 90) {
       return 'Incredible! Your typing skills are legendary!';
@@ -31,10 +33,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, wordCount, accuracy,
           <span className="text-sm text-gray-400 ml-2">points</span>
         </div>
         <p className="text-xl mb-8">{getMessage()}</p>
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-gray-700 p-4 rounded-lg">
-            <div className="text-sm text-gray-400">Words Completed</div>
+            <div className="text-sm text-gray-400">Words</div>
             <div className="text-2xl font-bold text-green-400">{wordCount}</div>
+          </div>
+          <div className="bg-gray-700 p-4 rounded-lg">
+            <div className="text-sm text-gray-400">WPM</div>
+            <div className="text-2xl font-bold text-purple-400">{wpm}</div>
           </div>
           <div className="bg-gray-700 p-4 rounded-lg">
             <div className="text-sm text-gray-400">Accuracy</div>

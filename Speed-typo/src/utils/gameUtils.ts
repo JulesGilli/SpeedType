@@ -69,6 +69,13 @@ export const modifyWord = (
 };
 
 
+// Mots par minute : convention standard = (caractères corrects / 5) / minutes.
+export const computeWpm = (correctChars: number, durationSec: number) => {
+  const minutes = durationSec / 60;
+  if (minutes <= 0) return 0;
+  return Math.round((correctChars / 5) / minutes);
+};
+
 // Calculate score based on word length, time taken, and combo
 export const calculateScore = (
   wordLength: number,
