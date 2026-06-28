@@ -11,6 +11,10 @@ export interface LeaderboardRow {
   games_count: number;
 }
 
+export interface MyRankRow extends LeaderboardRow {
+  rank: number;
+}
+
 // Appelle la fonction SQL st_leaderboard(period, mode).
 export async function fetchLeaderboard(
   period: LeaderboardPeriod,
@@ -27,4 +31,23 @@ export async function fetchLeaderboard(
   }
 
   return (data as LeaderboardRow[]) ?? [];
+}
+
+// Rang du joueur connecté (même hors top 10). Renvoie null s'il n'a aucun
+// score sur cette période/ce mode, ou s'il n'est pas connecté.
+export async function fetchMyRank(
+  period: LeaderboardPeriod,
+  mode: GameMode
+): Promise<MyRankRow | null> {
+  const { data, error } = await supabase.rpc('st_my_rank', {
+    p_period: period,
+    p_mode: mode,
+  });
+
+  if (error) {
+    console.error('[leaderboard] erreur rang joueur:', error.message);
+    return null;
+  }
+
+  return (data as MyRankRow[])?.[0] ?? null;
 }

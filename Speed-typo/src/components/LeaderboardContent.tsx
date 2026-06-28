@@ -5,9 +5,14 @@ import { useAuth } from '../lib/AuthContext';
 import { useI18n } from '../lib/i18n';
 import {
   fetchLeaderboard,
+  fetchMyRank,
   LeaderboardPeriod,
   LeaderboardRow,
+  MyRankRow,
 } from '../lib/leaderboard';
+
+// Nombre d'entrées affichées dans le classement principal.
+const TOP_N = 10;
 
 const PERIODS: { key: LeaderboardPeriod; tkey: string }[] = [
   { key: 'week', tkey: 'periodWeek' },
@@ -18,11 +23,12 @@ const PERIODS: { key: LeaderboardPeriod; tkey: string }[] = [
 // Contenu du classement (sélecteurs + tableau), sans chrome de page.
 // Réutilisé par le dock repliable de l'accueil.
 const LeaderboardContent: React.FC = () => {
-  const { user, configured } = useAuth();
+  const { user, profile, configured } = useAuth();
   const { t } = useI18n();
   const [period, setPeriod] = useState<LeaderboardPeriod>('week');
   const [mode, setMode] = useState<GameMode>('classique');
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
+  const [myRank, setMyRank] = useState<MyRankRow | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,16 +38,25 @@ const LeaderboardContent: React.FC = () => {
     }
     let cancelled = false;
     setLoading(true);
-    fetchLeaderboard(period, mode).then((data) => {
+    Promise.all([
+      fetchLeaderboard(period, mode),
+      user ? fetchMyRank(period, mode) : Promise.resolve(null),
+    ]).then(([data, mine]) => {
       if (!cancelled) {
         setRows(data);
+        setMyRank(mine);
         setLoading(false);
       }
     });
     return () => {
       cancelled = true;
     };
-  }, [period, mode, configured]);
+  }, [period, mode, configured, user]);
+
+  const top = rows.slice(0, TOP_N);
+  // Le joueur figure-t-il déjà dans le top affiché ? (on compare les ids,
+  // robuste face aux ex æquo, plutôt que de comparer deux rangs calculés à part)
+  const meInTop = !!user && top.some((r) => r.user_id === user.id);
 
   const formatScore = (value: number) =>
     mode === 'endless' ? `${value} m` : `${value} pts`;
@@ -87,7 +102,7 @@ const LeaderboardContent: React.FC = () => {
             {t('noScoresPeriod')}
           </div>
         ) : (
-          rows.map((row, index) => {
+          top.map((row, index) => {
             const isMe = user?.id === row.user_id;
             const rankColor =
               index === 0
@@ -118,6 +133,42 @@ const LeaderboardContent: React.FC = () => {
               </div>
             );
           })
+        )}
+
+        {/* Ligne épinglée du joueur : rang réel s'il est hors top, sinon
+            invitation à se classer / à se connecter. Masquée s'il est déjà
+            visible dans le top ci-dessus. */}
+        {configured && !loading && !meInTop && (
+          !user ? (
+            <div className="px-3 py-2.5 text-center text-xs text-purple-300 bg-purple-500/10 border-t-2 border-gray-700">
+              {t('saveAnon')}
+            </div>
+          ) : myRank ? (
+            <div className="grid grid-cols-[2rem_1fr_4.5rem_3.5rem] gap-2 px-3 py-2 items-center text-sm bg-purple-500/10 border-t-2 border-gray-700">
+              <div className="font-bold text-gray-500">{myRank.rank}</div>
+              <div className="truncate">
+                <span className="text-purple-300 font-semibold">{myRank.username}</span>
+                <span className="text-xs text-purple-400 ml-1">{t('you')}</span>
+              </div>
+              <div className="text-right font-semibold text-green-400">
+                {formatScore(myRank.best_score)}
+              </div>
+              <div className="text-right text-gray-300">{myRank.best_wpm}</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-[2rem_1fr_4.5rem_3.5rem] gap-2 px-3 py-2 items-center text-sm bg-purple-500/10 border-t-2 border-gray-700">
+              <div className="font-bold text-gray-600">–</div>
+              <div className="truncate">
+                <span className="text-purple-300 font-semibold">
+                  {profile?.username ?? user.email}
+                </span>
+                <span className="text-xs text-purple-400 ml-1">{t('you')}</span>
+              </div>
+              <div className="col-span-2 text-right text-gray-400 text-xs">
+                {t('unranked')}
+              </div>
+            </div>
+          )
         )}
       </div>
     </div>
