@@ -27,9 +27,11 @@ const AuthBar = () => {
       <div className="mb-4 flex justify-center">
         <button
           onClick={signInWithGoogle}
-          className="flex items-center gap-2 bg-white text-gray-800 font-medium px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition-colors"
+          className="group flex items-center gap-2.5 bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 hover:border-white/20 text-gray-100 font-medium pl-2 pr-4 py-2 rounded-xl shadow-lg transition-all"
         >
-          <GoogleIcon />
+          <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-white shadow-sm">
+            <GoogleIcon />
+          </span>
           {t('connectGoogle')}
         </button>
       </div>
