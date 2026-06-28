@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import { GameMode } from '../types/GameMode';
 
-export type LeaderboardPeriod = 'week' | 'month' | 'all';
+export type LeaderboardPeriod = 'month' | 'all';
 
 export interface LeaderboardRow {
   user_id: string;

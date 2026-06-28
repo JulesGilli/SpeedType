@@ -18,7 +18,6 @@ const TOP_N = 10;
 type View = 'mode' | 'global';
 
 const PERIODS: { key: LeaderboardPeriod; tkey: string }[] = [
-  { key: 'week', tkey: 'periodWeek' },
   { key: 'month', tkey: 'periodMonth' },
   { key: 'all', tkey: 'periodAll' },
 ];
@@ -34,7 +33,7 @@ const LeaderboardContent: React.FC = () => {
   const { user, profile, configured } = useAuth();
   const { t } = useI18n();
   const [view, setView] = useState<View>('mode');
-  const [period, setPeriod] = useState<LeaderboardPeriod>('week');
+  const [period, setPeriod] = useState<LeaderboardPeriod>('month');
   const [mode, setMode] = useState<GameMode>('classique');
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [myRank, setMyRank] = useState<MyRankRow | null>(null);
