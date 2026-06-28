@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { GameResult } from '../types/GameResult';
 import { computeWpm } from '../utils/gameUtils';
 
@@ -7,92 +7,113 @@ interface EndlessPhraseGameProps {
     onStop: () => void;
 }
 
-const generateText = () => {
-    const words = [
-        'soleil', 'galaxie', 'astronaute', 'lumière', 'orbite', 'fusion',
-        'étoile', 'comète', 'constellation', 'téléportation',
-        'univers', 'gravité', 'cosmos', 'satellite', 'matière',
-        'dimension', 'trou', 'noir', 'collision', 'vitesse', 'quasar'
-    ];
-    return Array(1000)
-        .fill(0)
-        .map(() => words[Math.floor(Math.random() * words.length)])
-        .join(' ');
+const GAME_DURATION = 60;
+
+// Phrases thématiques (lettres + espaces uniquement, pour une frappe fluide).
+const PHRASES = [
+    'le sigma se reveille a cinq heures pour aller chercher le pain',
+    'ne fais jamais confiance a un npc qui distribue du rizz gratuit',
+    'le gigachad traverse l ohio sans jamais perdre son aura',
+    'chaque combo parfait remplit la salle d une energie cosmique',
+    'tape vite et laisse les mots tomber comme une pluie de meteores',
+    'la galaxie entiere retient son souffle quand tu lances un record',
+    'skibidi toilet a encore envahi le serveur pendant la nuit',
+    'garde ton calme respire et enchaine les frappes avec precision',
+    'les doigts dansent sur le clavier plus vite que la lumiere',
+    'un vrai champion ne regarde jamais ses touches il sent le rythme',
+    'le mode infini ne pardonne aucune hesitation alors reste concentre',
+    'feu vert sur la piste les lettres defilent a toute allure',
+    'ton aura grandit a chaque mot que tu fais tomber dans le vide',
+    'la vitesse se construit une frappe a la fois alors respecte le grind',
+    'le clavier chauffe et la foule scande deja ton pseudo legendaire',
+];
+
+// Construit un long flux de texte en piochant des phrases au hasard.
+const buildStream = (): string => {
+    let text = '';
+    while (text.length < 2200) {
+        const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+        text += (text ? ' ' : '') + phrase;
+    }
+    return text;
 };
 
 const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop }) => {
-    const [phrase, setPhrase] = useState('');
+    const phrase = useMemo(buildStream, []);
     const [index, setIndex] = useState(0);
-    const [shake, setShake] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(60);
+    const [errors, setErrors] = useState(0);
+    const [wrong, setWrong] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
+    const indexRef = useRef(0);
+    const wrongTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    useEffect(() => {
-        setPhrase(generateText());
-    }, []);
-
+    // Frappe : on avance sur la bonne lettre, on signale l'erreur sinon.
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            const key = e.key;
-            if (key.length === 1) {
-                if (key === phrase[index]) {
-                    setIndex(prev => prev + 1);
-                } else {
-                    setIndex(prev => Math.max(0, prev - 1));
-                    setShake(true);
-                    setTimeout(() => setShake(false), 200);
-                }
+            if (e.key.length !== 1) return; // ignore Shift, Alt, fleches, etc.
+            if (e.key === ' ') e.preventDefault(); // pas de scroll de page
+            const expected = phrase[indexRef.current];
+            if (e.key === expected) {
+                indexRef.current += 1;
+                setIndex(indexRef.current);
+            } else {
+                setErrors(prev => prev + 1);
+                setWrong(true);
+                if (wrongTimer.current) clearTimeout(wrongTimer.current);
+                wrongTimer.current = setTimeout(() => setWrong(false), 150);
             }
         };
-
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [phrase, index]);
+    }, [phrase]);
 
+    // Chrono.
     useEffect(() => {
         const interval = setInterval(() => {
-            setTimeLeft(prev => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    return 0;
-                }
-                return prev - 1;
-            });
+            setTimeLeft(prev => (prev <= 1 ? 0 : prev - 1));
         }, 1000);
-
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         if (timeLeft <= 0) {
-            const meters = index / 100;
-            const avgWordLength = 5;
-            const wordsTyped = Math.floor(index / avgWordLength);
-            const accuracy = 100;
-
+            const correct = indexRef.current;
+            const total = correct + errors;
+            const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
             onGameEnd({
                 mode: 'endless',
-                score: Math.round(meters),
-                wordCount: wordsTyped,
+                score: Math.round(correct / 10), // "distance" en mètres
+                wordCount: Math.floor(correct / 5),
                 accuracy,
-                wpm: computeWpm(index, 60),
+                wpm: computeWpm(correct, GAME_DURATION),
                 maxCombo: 0,
-                durationSec: 60,
+                durationSec: GAME_DURATION,
             });
         }
     }, [timeLeft]);
 
-    const current = phrase.substring(index, index + 30);
-    const before = phrase.substring(Math.max(0, index - 15), index);
+    // Stats live.
+    const elapsed = GAME_DURATION - timeLeft;
+    const liveWpm = elapsed > 0 ? computeWpm(index, elapsed) : 0;
+    const total = index + errors;
+    const liveAccuracy = total > 0 ? Math.round((index / total) * 100) : 100;
+    const distance = (index / 10).toFixed(1);
+    const wpmGauge = Math.min(100, (liveWpm / 130) * 100);
+
+    // Fenêtre de texte affichée autour du curseur (perf + effet de défilement).
+    const windowStart = Math.max(0, index - 30);
+    const slice = phrase.slice(windowStart, windowStart + 240);
 
     return (
         <div className="max-w-2xl w-full">
             {/* Bandeau haut */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-6">
                 <div className="text-xl font-bold">
-                    Distance : <span className="text-purple-400 animate-pulse">{(index / 100).toFixed(2)} m</span>
+                    Distance : <span className="text-purple-400">{distance} m</span>
                 </div>
                 <div className="text-xl font-bold">
-                    Temps : <span className={`${timeLeft <= 10 ? 'text-red-500' : 'text-green-400'}`}>{timeLeft}s</span>
+                    Temps :{' '}
+                    <span className={timeLeft <= 10 ? 'text-red-500' : 'text-green-400'}>{timeLeft}s</span>
                 </div>
                 <button
                     onClick={onStop}
@@ -102,31 +123,67 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
                 </button>
             </div>
 
-            {/* Cadre principal */}
-            <div
-                className={`bg-gray-800 p-6 rounded-lg shadow-lg relative overflow-hidden ${shake ? 'animate-shake' : ''
-                    }`}
-            >
-                <div className="flex pointer-events-none text-xl font-mono">
-                    <div className="text-gray-600 whitespace-nowrap">{before}</div>
-                    <span
-                        className="text-purple-300 relative -top-1"
-                        style={{ fontWeight: 'bold' }}
-                    >
-                        {phrase[index] || ''}
-                    </span>
+            {/* Stats live : WPM + précision */}
+            <div className="flex items-center gap-4 mb-4">
+                <div className="text-sm text-gray-300">
+                    WPM <span className="text-pink-400 font-bold text-base">{liveWpm}</span>
+                </div>
+                <div className="flex-1 h-2 bg-gray-700/70 rounded-full overflow-hidden">
                     <div
-                        className="whitespace-nowrap ml-1"
-                        style={{
-                            background: 'linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0))',
-                            WebkitBackgroundClip: 'text',
-                            color: 'transparent'
-                        }}
-                    >
-                        {current.substring(1)}
-                    </div>
+                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
+                        style={{ width: `${wpmGauge}%` }}
+                    />
+                </div>
+                <div className="text-sm text-gray-300">
+                    Précision <span className="text-green-400 font-bold text-base">{liveAccuracy}%</span>
                 </div>
             </div>
+
+            {/* Zone de frappe */}
+            <div
+                className={`relative rounded-2xl p-6 bg-gray-800/80 backdrop-blur-sm border transition-colors
+                    ${wrong ? 'border-red-500/70 animate-shake' : 'border-purple-500/40'}
+                `}
+                style={{
+                    boxShadow: wrong
+                        ? '0 0 30px rgba(239,68,68,0.25)'
+                        : '0 0 40px rgba(168,85,247,0.20)',
+                }}
+            >
+                <div
+                    className="font-mono text-2xl leading-relaxed tracking-wide select-none break-words"
+                    style={{
+                        maskImage: 'linear-gradient(180deg, transparent, #000 12%, #000 80%, transparent)',
+                        WebkitMaskImage: 'linear-gradient(180deg, transparent, #000 12%, #000 80%, transparent)',
+                        height: '8.5rem',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {slice.split('').map((ch, i) => {
+                        const pos = windowStart + i;
+                        const isCurrent = pos === index;
+                        const isTyped = pos < index;
+                        return (
+                            <span
+                                key={pos}
+                                className={
+                                    isCurrent
+                                        ? `rounded-sm ${wrong ? 'bg-red-500/40 text-white' : 'bg-pink-500/30 text-white border-l-2 border-pink-400'}`
+                                        : isTyped
+                                            ? 'text-gray-100'
+                                            : 'text-gray-600'
+                                }
+                            >
+                                {ch === ' ' ? ' ' : ch}
+                            </span>
+                        );
+                    })}
+                </div>
+            </div>
+
+            <p className="text-center text-xs text-gray-500 mt-4">
+                Tape le texte qui défile. Va le plus loin possible avant la fin du temps.
+            </p>
         </div>
     );
 };
