@@ -1,7 +1,8 @@
 -- ============================================================================
 -- Speed Typo — migration initiale
 -- ----------------------------------------------------------------------------
--- Appliquée automatiquement par l'intégration GitHub de Supabase au merge sur `main`.
+-- Appliquée via le MCP Supabase et/ou l'intégration GitHub (merge sur `main`).
+-- Idempotente : ré-exécutable sans erreur (drop policy if exists + if not exists).
 -- Tables préfixées `st_` pour cohabiter avec un projet Supabase existant.
 -- Sécurité : Row Level Security (RLS) activé sur toutes les tables.
 -- ============================================================================
@@ -18,13 +19,16 @@ create table if not exists public.st_profiles (
 alter table public.st_profiles enable row level security;
 
 -- Tout le monde peut lire les pseudos (affichage des classements).
+drop policy if exists "st_profiles read" on public.st_profiles;
 create policy "st_profiles read" on public.st_profiles
   for select using (true);
 
 -- Un user ne peut créer/modifier que son propre profil.
+drop policy if exists "st_profiles insert self" on public.st_profiles;
 create policy "st_profiles insert self" on public.st_profiles
   for insert with check (auth.uid() = id);
 
+drop policy if exists "st_profiles update self" on public.st_profiles;
 create policy "st_profiles update self" on public.st_profiles
   for update using (auth.uid() = id);
 
@@ -48,6 +52,9 @@ begin
   return new;
 end;
 $$;
+
+-- C'est un trigger interne : il ne doit pas être appelable via l'API REST.
+revoke execute on function public.st_handle_new_user() from public, anon, authenticated;
 
 drop trigger if exists st_on_auth_user_created on auth.users;
 create trigger st_on_auth_user_created
@@ -74,10 +81,12 @@ create index if not exists st_scores_user_idx on public.st_scores (user_id);
 alter table public.st_scores enable row level security;
 
 -- Classements publics : lecture pour tout le monde.
+drop policy if exists "st_scores read" on public.st_scores;
 create policy "st_scores read" on public.st_scores
   for select using (true);
 
 -- Un user n'insère que ses propres scores (anti-triche basique).
+drop policy if exists "st_scores insert self" on public.st_scores;
 create policy "st_scores insert self" on public.st_scores
   for insert with check (auth.uid() = user_id);
 
@@ -101,6 +110,7 @@ create index if not exists st_challenges_month_idx on public.st_challenges (mont
 alter table public.st_challenges enable row level security;
 
 -- Lecture publique des défis ; la création se fait via le dashboard (service_role).
+drop policy if exists "st_challenges read" on public.st_challenges;
 create policy "st_challenges read" on public.st_challenges
   for select using (true);
 
@@ -118,9 +128,11 @@ create table if not exists public.st_challenge_completions (
 
 alter table public.st_challenge_completions enable row level security;
 
+drop policy if exists "st_challenge_completions read" on public.st_challenge_completions;
 create policy "st_challenge_completions read" on public.st_challenge_completions
   for select using (true);
 
+drop policy if exists "st_challenge_completions insert self" on public.st_challenge_completions;
 create policy "st_challenge_completions insert self" on public.st_challenge_completions
   for insert with check (auth.uid() = user_id);
 
