@@ -4,12 +4,19 @@ import GameScreen from './components/GameScreen';
 import ResultScreen from './components/ResultScreen';
 import { GameMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
+import { useAuth } from './lib/AuthContext';
+import { submitScore } from './lib/scores';
+
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error' | 'anon';
 
 function App() {
   const [gameState, setGameState] = useState<'start' | 'playing' | 'result'>('start');
   const [result, setResult] = useState<GameResult | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
   const [selectedMode, setSelectedMode] = useState<GameMode>('classique');
+
+  const { user, configured } = useAuth();
 
   const startGame = () => {
     setGameState('playing');
@@ -18,6 +25,17 @@ function App() {
   const endGame = (gameResult: GameResult) => {
     setResult(gameResult);
     setGameState('result');
+
+    // Enregistrement du score : seulement si le backend est configuré ET connecté.
+    if (!configured || !user) {
+      setSaveStatus('anon');
+      return;
+    }
+
+    setSaveStatus('saving');
+    submitScore(gameResult, user.id).then(({ error }) => {
+      setSaveStatus(error ? 'error' : 'saved');
+    });
   };
 
   const restartGame = () => {
@@ -41,7 +59,7 @@ function App() {
         />
       )}
       {gameState === 'result' && result && (
-        <ResultScreen result={result} onRestart={restartGame} />
+        <ResultScreen result={result} saveStatus={saveStatus} onRestart={restartGame} />
       )}
     </div>
   );

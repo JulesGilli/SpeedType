@@ -1,11 +1,26 @@
 import { GameResult } from '../types/GameResult';
+import { SaveStatus } from '../App';
 
 interface ResultScreenProps {
   result: GameResult;
+  saveStatus: SaveStatus;
   onRestart: () => void;
 }
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ result, onRestart }) => {
+const SaveStatusLine: React.FC<{ status: SaveStatus }> = ({ status }) => {
+  const map: Record<SaveStatus, { text: string; className: string } | null> = {
+    idle: null,
+    saving: { text: '⏳ Enregistrement du score…', className: 'text-gray-400' },
+    saved: { text: '✅ Score enregistré dans le classement', className: 'text-green-400' },
+    error: { text: '⚠️ Échec de l’enregistrement du score', className: 'text-red-400' },
+    anon: { text: '🔒 Connecte-toi pour apparaître au classement', className: 'text-yellow-400' },
+  };
+  const entry = map[status];
+  if (!entry) return null;
+  return <p className={`text-sm mb-4 ${entry.className}`}>{entry.text}</p>;
+};
+
+const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onRestart }) => {
   const { score, wordCount, accuracy, wpm } = result;
 
   const getMessage = () => {
@@ -32,7 +47,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ result, onRestart }) => {
           {score}
           <span className="text-sm text-gray-400 ml-2">points</span>
         </div>
-        <p className="text-xl mb-8">{getMessage()}</p>
+        <p className="text-xl mb-4">{getMessage()}</p>
+        <SaveStatusLine status={saveStatus} />
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-gray-700 p-4 rounded-lg">
             <div className="text-sm text-gray-400">Words</div>
