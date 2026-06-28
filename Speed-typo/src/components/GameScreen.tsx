@@ -83,7 +83,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   }, [timeLeft]);
 
   const generateNewWord = () => {
-    const word = getRandomWord();
+    const word = getRandomWord(selectedMode);
     const includeNumbers = selectedMode === 'leet';
     const reverseWords = selectedMode === 'inversé';
     const { modified, isLeet, isReversed } = modifyWord(word, includeNumbers, reverseWords);

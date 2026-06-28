@@ -5,6 +5,7 @@ import ResultScreen from './components/ResultScreen';
 import LeaderboardDock from './components/LeaderboardDock';
 import ChallengesDock from './components/ChallengesDock';
 import Background from './components/Background';
+import BackgroundToggle from './components/BackgroundToggle';
 import { GameMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
@@ -20,6 +21,14 @@ function App() {
   const [claimed, setClaimed] = useState<ClaimedChallenge[]>([]);
 
   const [selectedMode, setSelectedMode] = useState<GameMode>('classique');
+  const [bgEnabled, setBgEnabled] = useState<boolean>(
+    () => localStorage.getItem('st_bg_enabled') !== 'false'
+  );
+
+  const toggleBackground = (value: boolean) => {
+    setBgEnabled(value);
+    localStorage.setItem('st_bg_enabled', String(value));
+  };
 
   const { user, configured } = useAuth();
 
@@ -54,7 +63,7 @@ function App() {
 
   return (
     <div className="relative w-full min-h-screen text-white">
-      <Background />
+      <Background enabled={bgEnabled} />
 
       <div className="relative z-10 w-full min-h-screen flex flex-col items-center justify-center p-4">
       {gameState === 'start' && (
@@ -80,9 +89,10 @@ function App() {
         />
       )}
 
-      {/* Docks toujours présents sur l'accueil */}
+      {/* Docks + toggle de fond : toujours présents sur l'accueil */}
       {gameState === 'start' && (
         <>
+          <BackgroundToggle enabled={bgEnabled} onToggle={toggleBackground} />
           <LeaderboardDock />
           <ChallengesDock />
         </>

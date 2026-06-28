@@ -1,24 +1,64 @@
-// Word list
-const words = [
-  "skibidi toilet", "gyatt", "sigma grindset", "rizz god", "cap or no cap", "sheesh", "ok boomer",
-  "deez nuts", "ligma balls", "among us", "sussy baka", "skrrt skrrt", "yeet", "chad", "giga chad",
-  "emotional damage", "waffle house", "you fell off", "it's corn", "i'm him", "goofy ahh", "ohio final boss",
-  "griddy", "npc moment", "caught in 4k", "based", "cringe", "ratio", "beluga", "meme lord", "me when",
-  "i'm a bird", "tiktok toe", "bouba", "dababy", "yo mama", "tiktok voice", "sigma male", "average fan",
+import { GameMode } from '../types/GameMode';
 
-  "leeroy jenkins", "hadouken", "finish him", "fatality", "arrow to the knee", "ultra kill",
-  "get over here", "do a barrel roll", "it's a me", "the cake is a lie", "press f", "headshot",
-  "ez pz", "git gud", "dark souls", "bonfire lit", "respawn", "critical hit", "boom headshot",
-  "sniper gang", "360 no scope", "loot goblin", "red barrel", "noob tube", "pay to win",
-  "op pls nerf", "lag switch", "zergling rush", "baby yoda", "victory royale", "build battle",
-  "sus impostor", "rez me", "tea bag", "power move", "you died", "let it die", "wall hack",
-  "dev mode", "cheat code", "konami code", "boom shakalaka", "gotta go fast", "blue shell"
+// Pool commun (brainrot / gaming), partagé par tous les modes.
+const COMMON_WORDS = [
+  "skibidi toilet", "gyatt", "sigma grindset", "rizz god", "no cap", "sheesh", "ok boomer",
+  "among us", "sussy baka", "yeet", "giga chad", "emotional damage", "you fell off", "it's corn",
+  "i'm him", "goofy ahh", "ohio final boss", "griddy", "npc moment", "caught in 4k", "based",
+  "cringe", "ratio", "beluga", "meme lord", "sigma male", "skrrt", "bussin", "fr fr", "mid",
+  "gg ez", "touch grass", "main character", "glow up", "sus", "drip", "slay", "vibe check",
+  "rent free", "built different", "menace", "aura points", "negative aura", "mewing", "looksmaxxing",
+  "brainrot", "delulu", "mogging", "fanum tax", "baby gronk", "kai cenat", "duke dennis",
+  "grimace shake", "quandale dingle", "waffle house", "let him cook", "ratioed", "gyatt rizz",
 ];
 
-// Get a random word from the word list
-export const getRandomWord = () => {
-  const randomIndex = Math.floor(Math.random() * words.length);
-  return words[randomIndex];
+// Mots spécifiques à chaque mode, pour varier le ressenti d'un mode à l'autre.
+const MODE_WORDS: Record<GameMode, string[]> = {
+  classique: [
+    "speedrun", "clutch play", "headshot", "victory royale", "wombo combo", "critical hit",
+    "boss fight", "loot drop", "respawn point", "power up", "combo breaker", "final boss",
+    "easter egg", "cheat code", "high score", "no scope", "ultra kill", "first blood",
+  ],
+  leet: [
+    "elite hacker", "leet speak", "aimbot", "sudo access", "root exploit", "data breach",
+    "stack trace", "null pointer", "segfault", "kernel panic", "ascii art", "binary tree",
+    "trojan horse", "buffer overflow", "zero cool", "matrix code",
+  ],
+  inversé: [
+    "monde", "clavier", "vitesse", "cosmos", "galaxie", "pixel", "ninja", "dragon", "matrix",
+    "turbo", "laser", "prisme", "vortex", "photon", "quantum", "nebula",
+  ],
+  memoire: [
+    "chat", "pizza", "robot", "tigre", "nuage", "flamme", "ombre", "givre", "metal", "piano",
+    "cobra", "venin", "jade", "onyx", "echo", "lynx",
+  ],
+  blind: [
+    "bonjour", "merci", "clavier", "souris", "fenetre", "ananas", "banane", "orange", "cerise",
+    "fraise", "carotte", "tomate", "salade", "fromage", "baguette", "lumiere",
+  ],
+  endless: [], // le mode endless utilise ses propres phrases
+};
+
+const shuffle = <T,>(arr: T[]): T[] => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+// Sac mélangé par mode : on épuise tout le pool avant de répéter un mot.
+const bags: Partial<Record<GameMode, string[]>> = {};
+
+// Tire un mot pour un mode donné, sans répétition tant que le pool n'est pas épuisé.
+export const getRandomWord = (mode: GameMode = 'classique') => {
+  let bag = bags[mode];
+  if (!bag || bag.length === 0) {
+    bag = shuffle([...COMMON_WORDS, ...(MODE_WORDS[mode] ?? [])]);
+    bags[mode] = bag;
+  }
+  return bag.pop() as string;
 };
 // Replace letters with numbers or reverse the word
 export const modifyWord = (

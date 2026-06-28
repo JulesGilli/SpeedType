@@ -37,7 +37,7 @@ const GameModeSelector: React.FC<GameModeSelectorProps> = ({ selectedMode, onSel
           className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 shadow
             ${selectedMode === mode
               ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-              : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}
+              : 'bg-white/10 text-gray-200 border border-white/10 backdrop-blur-sm hover:bg-white/20'}
           `}
         >
           {getModeLabel(mode)}
