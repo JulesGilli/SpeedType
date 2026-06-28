@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { GameResult } from '../types/GameResult';
 import { computeWpm } from '../utils/gameUtils';
-import { useI18n } from '../lib/i18n';
+import { useI18n, ENDLESS_PHRASES } from '../lib/i18n';
 
 interface EndlessPhraseGameProps {
     onGameEnd: (result: GameResult) => void;
@@ -10,38 +10,19 @@ interface EndlessPhraseGameProps {
 
 const GAME_DURATION = 60;
 
-// Phrases thématiques (lettres + espaces uniquement, pour une frappe fluide).
-const PHRASES = [
-    'le sigma se reveille a cinq heures pour aller chercher le pain',
-    'ne fais jamais confiance a un npc qui distribue du rizz gratuit',
-    'le gigachad traverse l ohio sans jamais perdre son aura',
-    'chaque combo parfait remplit la salle d une energie cosmique',
-    'tape vite et laisse les mots tomber comme une pluie de meteores',
-    'la galaxie entiere retient son souffle quand tu lances un record',
-    'skibidi toilet a encore envahi le serveur pendant la nuit',
-    'garde ton calme respire et enchaine les frappes avec precision',
-    'les doigts dansent sur le clavier plus vite que la lumiere',
-    'un vrai champion ne regarde jamais ses touches il sent le rythme',
-    'le mode infini ne pardonne aucune hesitation alors reste concentre',
-    'feu vert sur la piste les lettres defilent a toute allure',
-    'ton aura grandit a chaque mot que tu fais tomber dans le vide',
-    'la vitesse se construit une frappe a la fois alors respecte le grind',
-    'le clavier chauffe et la foule scande deja ton pseudo legendaire',
-];
-
-// Construit un long flux de texte en piochant des phrases au hasard.
-const buildStream = (): string => {
+// Construit un long flux de texte en piochant des phrases (de la langue) au hasard.
+const buildStream = (phrases: string[]): string => {
     let text = '';
     while (text.length < 2200) {
-        const phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
         text += (text ? ' ' : '') + phrase;
     }
     return text;
 };
 
 const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop }) => {
-    const { t } = useI18n();
-    const phrase = useMemo(buildStream, []);
+    const { t, lang } = useI18n();
+    const phrase = useMemo(() => buildStream(ENDLESS_PHRASES[lang] ?? ENDLESS_PHRASES.en), [lang]);
     const [index, setIndex] = useState(0);
     const [errors, setErrors] = useState(0);
     const [wrong, setWrong] = useState(false);
