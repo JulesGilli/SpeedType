@@ -2,7 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import GameModeSelector from './GameModeSelector';
 import AuthBar from './AuthBar';
+import Typewriter from './Typewriter';
 import { GameMode } from '../types/GameMode';
+import { useI18n } from '../lib/i18n';
 
 interface StartScreenProps {
   onStart: () => void;
@@ -10,48 +12,14 @@ interface StartScreenProps {
   setSelectedMode: (mode: GameMode) => void;
 }
 
-const getModeDescription = (mode: GameMode): string[] => {
-  switch (mode) {
-    case 'classique':
-      return [
-        'Tape les mots qui s’affichent à l’écran.',
-        'Tape vite pour enchaîner les combos et gagner plus de points !',
-      ];
-    case 'leet':
-      return [
-        'Certains mots auront des chiffres à la place des lettres (E → 3, A → 4, etc).',
-        'Tape vite pour enchaîner les combos et gagner plus de points !',
-      ];
-    case 'inversé':
-      return [
-        'Certains mots seront écrits à l’envers (ex : "monde" devient "ednom").',
-        'Tape vite pour enchaîner les combos et gagner plus de points !',
-      ];
-    case 'memoire':
-      return [
-        'Les mots s’affichent brièvement puis disparaissent.',
-        'Lis-les rapidement, mémorise-les et tape-les de tête.',
-      ];
-    case 'blind':
-      return [
-        'Tu ne verras pas ce que tu tapes.',
-        'Fais confiance à ta mémoire musculaire pour réussir.',
-      ];
-    case 'endless':
-      return [
-        'Un long texte défile en continu : tape-le sans t’arrêter.',
-        'Va le plus loin possible avant la fin du temps — distance et WPM en direct !',
-      ];
-    default:
-      return [];
-  }
-};
-
 const StartScreen: React.FC<StartScreenProps> = ({
   onStart,
   selectedMode,
   setSelectedMode,
 }) => {
+  const { t, modeDesc } = useI18n();
+  const lines = modeDesc(selectedMode);
+
   return (
     <div className="max-w-md w-full text-center">
       <motion.div
@@ -68,7 +36,7 @@ const StartScreen: React.FC<StartScreenProps> = ({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.1 }}
       >
-        Speed Typo
+        <Typewriter text="SpeedType" speed={70} startDelay={150} />
       </motion.h1>
 
       <motion.div
@@ -85,12 +53,16 @@ const StartScreen: React.FC<StartScreenProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
       >
-        <h2 className="text-xl font-semibold mb-4">Comment jouer</h2>
-        <ul className="text-left space-y-2 mb-6">
-          {getModeDescription(selectedMode).map((line, index) => (
-            <li key={index} className="flex items-start">
+        <h2 className="text-xl font-semibold mb-4">
+          <Typewriter text={t('howToPlay')} startDelay={900} />
+        </h2>
+        <ul className="text-left space-y-2 mb-6 min-h-[3.5rem]">
+          {lines.map((line, index) => (
+            <li key={`${selectedMode}-${index}`} className="flex items-start">
               <span className="text-purple-400 mr-2">•</span>
-              <span>{line}</span>
+              <span>
+                <Typewriter text={line} startDelay={1100 + index * 700} />
+              </span>
             </li>
           ))}
         </ul>
@@ -101,7 +73,7 @@ const StartScreen: React.FC<StartScreenProps> = ({
           whileTap={{ scale: 0.97 }}
           className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 shadow-lg"
         >
-          Commencer
+          {t('start')}
         </motion.button>
       </motion.div>
     </div>

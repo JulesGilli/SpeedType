@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import LeaderboardContent from './LeaderboardContent';
+import { useI18n } from '../lib/i18n';
 
 // Dock "Classement" toujours présent sur l'accueil : une barre cliquable
 // ancrée en bas à droite qui déplie le classement vers le haut.
 const LeaderboardDock: React.FC = () => {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   return (
@@ -23,7 +25,7 @@ const LeaderboardDock: React.FC = () => {
           onClick={() => setOpen((v) => !v)}
           className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-4 py-3 flex items-center justify-between text-white font-semibold transition-colors"
         >
-          <span>Classement</span>
+          <span>{t('leaderboard')}</span>
           <svg
             width="18"
             height="18"

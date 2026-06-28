@@ -1,4 +1,5 @@
 import { useAuth } from '../lib/AuthContext';
+import { useI18n } from '../lib/i18n';
 
 // Petit logo Google (inline, pas de dépendance).
 const GoogleIcon = () => (
@@ -12,6 +13,7 @@ const GoogleIcon = () => (
 
 const AuthBar = () => {
   const { configured, loading, user, profile, signInWithGoogle, signOut } = useAuth();
+  const { t } = useI18n();
 
   // Backend non configuré : on n'affiche rien (le jeu reste jouable en local).
   if (!configured) return null;
@@ -28,7 +30,7 @@ const AuthBar = () => {
           className="flex items-center gap-2 bg-white text-gray-800 font-medium px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition-colors"
         >
           <GoogleIcon />
-          Se connecter avec Google
+          {t('connectGoogle')}
         </button>
       </div>
     );
@@ -37,14 +39,14 @@ const AuthBar = () => {
   return (
     <div className="mb-4 flex items-center justify-center gap-3">
       <span className="text-sm text-gray-300">
-        Connecté :{' '}
+        {t('connected')}{' '}
         <span className="text-purple-400 font-semibold">{profile?.username ?? user.email}</span>
       </span>
       <button
         onClick={signOut}
         className="text-xs px-3 py-1 rounded bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
       >
-        Déconnexion
+        {t('logout')}
       </button>
     </div>
   );

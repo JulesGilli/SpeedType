@@ -1,31 +1,14 @@
 import React from 'react';
 import { GameMode } from '../types/GameMode';
+import { useI18n } from '../lib/i18n';
 
 interface GameModeSelectorProps {
   selectedMode: GameMode;
   onSelectMode: (mode: GameMode) => void;
 }
 
-const getModeLabel = (mode: GameMode) => {
-  switch (mode) {
-    case 'classique':
-      return 'Classique';
-    case 'inversé':
-      return 'Inversé';
-    case 'leet':
-      return 'Leet';
-    case 'memoire':
-      return 'Mémoire';
-    case 'blind':
-      return 'Blind';
-    case 'endless':
-      return 'Phrase infinie';
-    default:
-      return mode;
-  }
-};
-
 const GameModeSelector: React.FC<GameModeSelectorProps> = ({ selectedMode, onSelectMode }) => {
+  const { modeLabel } = useI18n();
   const modes: GameMode[] = ['classique', 'inversé', 'leet', 'memoire', 'blind', 'endless'];
 
   return (
@@ -40,7 +23,7 @@ const GameModeSelector: React.FC<GameModeSelectorProps> = ({ selectedMode, onSel
               : 'bg-white/10 text-gray-200 border border-white/10 backdrop-blur-sm hover:bg-white/20'}
           `}
         >
-          {getModeLabel(mode)}
+          {modeLabel(mode)}
         </button>
       ))}
     </div>

@@ -2,22 +2,24 @@ import { useEffect, useState } from 'react';
 import GameModeSelector from './GameModeSelector';
 import { GameMode } from '../types/GameMode';
 import { useAuth } from '../lib/AuthContext';
+import { useI18n } from '../lib/i18n';
 import {
   fetchLeaderboard,
   LeaderboardPeriod,
   LeaderboardRow,
 } from '../lib/leaderboard';
 
-const PERIODS: { key: LeaderboardPeriod; label: string }[] = [
-  { key: 'week', label: 'Semaine' },
-  { key: 'month', label: 'Mois' },
-  { key: 'all', label: 'Tout temps' },
+const PERIODS: { key: LeaderboardPeriod; tkey: string }[] = [
+  { key: 'week', tkey: 'periodWeek' },
+  { key: 'month', tkey: 'periodMonth' },
+  { key: 'all', tkey: 'periodAll' },
 ];
 
 // Contenu du classement (sélecteurs + tableau), sans chrome de page.
 // Réutilisé par le dock repliable de l'accueil.
 const LeaderboardContent: React.FC = () => {
   const { user, configured } = useAuth();
+  const { t } = useI18n();
   const [period, setPeriod] = useState<LeaderboardPeriod>('week');
   const [mode, setMode] = useState<GameMode>('classique');
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
@@ -58,7 +60,7 @@ const LeaderboardContent: React.FC = () => {
                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}
             `}
           >
-            {p.label}
+            {t(p.tkey)}
           </button>
         ))}
       </div>
@@ -69,20 +71,20 @@ const LeaderboardContent: React.FC = () => {
       <div className="bg-gray-900/60 rounded-lg overflow-hidden mt-3">
         <div className="grid grid-cols-[2rem_1fr_4.5rem_3.5rem] gap-2 px-3 py-2 text-xs text-gray-400 border-b border-gray-700">
           <div>#</div>
-          <div>Joueur</div>
-          <div className="text-right">Score</div>
-          <div className="text-right">WPM</div>
+          <div>{t('colPlayer')}</div>
+          <div className="text-right">{t('colScore')}</div>
+          <div className="text-right">{t('wpm')}</div>
         </div>
 
         {!configured ? (
           <div className="px-3 py-8 text-center text-gray-400 text-sm">
-            Connexion au serveur requise.
+            {t('serverRequired')}
           </div>
         ) : loading ? (
-          <div className="px-3 py-8 text-center text-gray-400 text-sm">Chargement…</div>
+          <div className="px-3 py-8 text-center text-gray-400 text-sm">{t('loading')}</div>
         ) : rows.length === 0 ? (
           <div className="px-3 py-8 text-center text-gray-400 text-sm">
-            Aucun score sur cette période. Sois le premier !
+            {t('noScoresPeriod')}
           </div>
         ) : (
           rows.map((row, index) => {
@@ -107,7 +109,7 @@ const LeaderboardContent: React.FC = () => {
                   <span className={isMe ? 'text-purple-300 font-semibold' : 'text-white'}>
                     {row.username}
                   </span>
-                  {isMe && <span className="text-xs text-purple-400 ml-1">(toi)</span>}
+                  {isMe && <span className="text-xs text-purple-400 ml-1">{t('you')}</span>}
                 </div>
                 <div className="text-right font-semibold text-green-400">
                   {formatScore(row.best_score)}

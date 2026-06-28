@@ -5,6 +5,7 @@ import FloatingScore from './FloatingScore';
 import { getRandomWord, modifyWord, calculateScore, computeWpm } from '../utils/gameUtils';
 import { GameMode } from '../types/GameMode';
 import { GameResult } from '../types/GameResult';
+import { useI18n } from '../lib/i18n';
 import EndlessPhraseGame from './EndlessPhraseGame';
 
 const GAME_DURATION = 60;
@@ -20,6 +21,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     return <EndlessPhraseGame onGameEnd={onGameEnd} onStop={onStop} />;
   }
 
+  const { t } = useI18n();
   const [modifiedWord, setModifiedWord] = useState('');
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState(0);
@@ -224,10 +226,10 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     <div className="max-w-2xl w-full">
       <div className="flex justify-between items-center mb-8">
         <div className="text-xl font-bold">
-          Score: <span className="text-purple-400 animate-pulse">{score}</span>
+          {t('score')}: <span className="text-purple-400 animate-pulse">{score}</span>
         </div>
         <div className="text-xl font-bold">
-          Time:{' '}
+          {t('time')}:{' '}
           <span className={`${timeLeft <= 10 ? 'text-red-500' : 'text-green-400'}`}>
             {timeLeft}s
           </span>
@@ -236,7 +238,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
           onClick={onStop}
           className="text-sm px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
         >
-          Quitter
+          {t('quit')}
         </button>
       </div>
 
@@ -269,7 +271,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
           ${showEffect ? 'opacity-30 scale-95' : 'opacity-100 scale-100'}
         `}>
           <div className="mb-8 text-center">
-            <div className="text-sm text-gray-400 mb-2">Type this word:</div>
+            <div className="text-sm text-gray-400 mb-2">{t('typeThisWord')}</div>
             {showWord ? (
               <WordDisplay word={modifiedWord} />
             ) : (
@@ -303,10 +305,10 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
 
           <div className="mt-6 flex justify-between text-sm">
             <div>
-              Words: <span className="text-green-400">{wordsCompleted}</span>
+              {t('words')}: <span className="text-green-400">{wordsCompleted}</span>
             </div>
             <div>
-              Combo:{' '}
+              {t('combo')}:{' '}
               <span className={`
                 ${comboCount >= 5 ? 'text-pink-400 animate-pulse font-bold'
                   : comboCount >= 3 ? 'text-purple-400 animate-pulse'

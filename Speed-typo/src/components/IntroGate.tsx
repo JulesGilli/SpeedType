@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useI18n } from '../lib/i18n';
 
 const TARGET = 'SpeedType';
 
@@ -9,6 +10,7 @@ interface IntroGateProps {
 
 // Écran d'intro : l'utilisateur doit taper "SpeedType" pour déverrouiller l'UI.
 const IntroGate: React.FC<IntroGateProps> = ({ onUnlock }) => {
+  const { t } = useI18n();
   const [typed, setTyped] = useState(0);
   const [wrong, setWrong] = useState(false);
   const [done, setDone] = useState(false);
@@ -100,8 +102,8 @@ const IntroGate: React.FC<IntroGateProps> = ({ onUnlock }) => {
         animate={{ opacity: done ? 0 : 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.5 }}
       >
-        Tape <span className="text-gray-200 font-semibold">SpeedType</span> pour entrer
-        <span className="text-gray-600"> · Entrée pour passer</span>
+        {t('introType')} <span className="text-gray-200 font-semibold">SpeedType</span> {t('introEnter')}
+        <span className="text-gray-600"> · {t('introSkip')}</span>
       </motion.p>
     </motion.div>
   );

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import ChallengesContent from './ChallengesContent';
+import { useI18n } from '../lib/i18n';
 
 // Dock "Défis du mois" repliable, ancré en bas à gauche de l'accueil.
 const ChallengesDock: React.FC = () => {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   return (
@@ -20,7 +22,7 @@ const ChallengesDock: React.FC = () => {
           onClick={() => setOpen((v) => !v)}
           className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 px-4 py-3 flex items-center justify-between text-white font-semibold transition-colors"
         >
-          <span>Défis du mois</span>
+          <span>{t('challengesMonth')}</span>
           <svg
             width="18"
             height="18"

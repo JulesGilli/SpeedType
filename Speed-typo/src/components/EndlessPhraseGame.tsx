@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { GameResult } from '../types/GameResult';
 import { computeWpm } from '../utils/gameUtils';
+import { useI18n } from '../lib/i18n';
 
 interface EndlessPhraseGameProps {
     onGameEnd: (result: GameResult) => void;
@@ -39,6 +40,7 @@ const buildStream = (): string => {
 };
 
 const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop }) => {
+    const { t } = useI18n();
     const phrase = useMemo(buildStream, []);
     const [index, setIndex] = useState(0);
     const [errors, setErrors] = useState(0);
@@ -109,24 +111,24 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
             {/* Bandeau haut */}
             <div className="flex justify-between items-center mb-6">
                 <div className="text-xl font-bold">
-                    Distance : <span className="text-purple-400">{distance} m</span>
+                    {t('distance')} : <span className="text-purple-400">{distance} m</span>
                 </div>
                 <div className="text-xl font-bold">
-                    Temps :{' '}
+                    {t('time')} :{' '}
                     <span className={timeLeft <= 10 ? 'text-red-500' : 'text-green-400'}>{timeLeft}s</span>
                 </div>
                 <button
                     onClick={onStop}
                     className="text-sm px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                    Quitter
+                    {t('quit')}
                 </button>
             </div>
 
             {/* Stats live : WPM + précision */}
             <div className="flex items-center gap-4 mb-4">
                 <div className="text-sm text-gray-300">
-                    WPM <span className="text-pink-400 font-bold text-base">{liveWpm}</span>
+                    {t('wpm')} <span className="text-pink-400 font-bold text-base">{liveWpm}</span>
                 </div>
                 <div className="flex-1 h-2 bg-gray-700/70 rounded-full overflow-hidden">
                     <div
@@ -135,7 +137,7 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
                     />
                 </div>
                 <div className="text-sm text-gray-300">
-                    Précision <span className="text-green-400 font-bold text-base">{liveAccuracy}%</span>
+                    {t('accuracy')} <span className="text-green-400 font-bold text-base">{liveAccuracy}%</span>
                 </div>
             </div>
 
@@ -182,7 +184,7 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
             </div>
 
             <p className="text-center text-xs text-gray-500 mt-4">
-                Tape le texte qui défile. Va le plus loin possible avant la fin du temps.
+                {t('endlessHint')}
             </p>
         </div>
     );

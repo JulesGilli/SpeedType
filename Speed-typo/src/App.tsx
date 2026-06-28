@@ -8,6 +8,7 @@ import LeaderboardDock from './components/LeaderboardDock';
 import ChallengesDock from './components/ChallengesDock';
 import Background from './components/Background';
 import BackgroundToggle from './components/BackgroundToggle';
+import LanguageSelector from './components/LanguageSelector';
 import { GameMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
@@ -65,7 +66,7 @@ function App() {
   };
 
   return (
-    <div className="relative w-full min-h-screen text-white">
+    <div className="relative w-full min-h-screen text-white overflow-hidden">
       <Background enabled={bgEnabled} />
 
       <AnimatePresence mode="wait">
@@ -105,6 +106,7 @@ function App() {
       {/* Docks + toggle de fond : toujours présents sur l'accueil */}
       {gameState === 'start' && (
         <>
+          <LanguageSelector />
           <BackgroundToggle enabled={bgEnabled} onToggle={toggleBackground} />
           <LeaderboardDock />
           <ChallengesDock />
