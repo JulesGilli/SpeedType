@@ -5,22 +5,23 @@ interface ResultScreenProps {
   result: GameResult;
   saveStatus: SaveStatus;
   onRestart: () => void;
+  onShowLeaderboard: () => void;
 }
 
 const SaveStatusLine: React.FC<{ status: SaveStatus }> = ({ status }) => {
   const map: Record<SaveStatus, { text: string; className: string } | null> = {
     idle: null,
-    saving: { text: '⏳ Enregistrement du score…', className: 'text-gray-400' },
-    saved: { text: '✅ Score enregistré dans le classement', className: 'text-green-400' },
-    error: { text: '⚠️ Échec de l’enregistrement du score', className: 'text-red-400' },
-    anon: { text: '🔒 Connecte-toi pour apparaître au classement', className: 'text-yellow-400' },
+    saving: { text: 'Enregistrement du score…', className: 'text-gray-400' },
+    saved: { text: 'Score enregistré dans le classement', className: 'text-green-400' },
+    error: { text: 'Échec de l’enregistrement du score', className: 'text-red-400' },
+    anon: { text: 'Connecte-toi pour apparaître au classement', className: 'text-yellow-400' },
   };
   const entry = map[status];
   if (!entry) return null;
   return <p className={`text-sm mb-4 ${entry.className}`}>{entry.text}</p>;
 };
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onRestart }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onRestart, onShowLeaderboard }) => {
   const { score, wordCount, accuracy, wpm } = result;
 
   const getMessage = () => {
@@ -64,12 +65,20 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onResta
           </div>
         </div>
       </div>
-      <button
-        onClick={onRestart}
-        className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"
-      >
-        Play Again
-      </button>
+      <div className="flex flex-col gap-3 items-center">
+        <button
+          onClick={onRestart}
+          className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"
+        >
+          Play Again
+        </button>
+        <button
+          onClick={onShowLeaderboard}
+          className="text-sm text-gray-300 hover:text-white underline underline-offset-4 transition-colors"
+        >
+          Voir le classement
+        </button>
+      </div>
     </div>
   );
 };
