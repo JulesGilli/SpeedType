@@ -5,7 +5,6 @@ import { GameMode } from '../types/GameMode';
 
 interface StartScreenProps {
   onStart: () => void;
-  onShowLeaderboard: () => void;
   selectedMode: GameMode;
   setSelectedMode: (mode: GameMode) => void;
 }
@@ -44,7 +43,6 @@ const getModeDescription = (mode: GameMode): string[] => {
 
 const StartScreen: React.FC<StartScreenProps> = ({
   onStart,
-  onShowLeaderboard,
   selectedMode,
   setSelectedMode,
 }) => {
@@ -69,20 +67,12 @@ const StartScreen: React.FC<StartScreenProps> = ({
           ))}
         </ul>
 
-        <div className="flex flex-col gap-3 items-center">
-          <button
-            onClick={onStart}
-            className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"
-          >
-            Commencer
-          </button>
-          <button
-            onClick={onShowLeaderboard}
-            className="text-sm text-gray-300 hover:text-white underline underline-offset-4 transition-colors"
-          >
-            Voir le classement
-          </button>
-        </div>
+        <button
+          onClick={onStart}
+          className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"
+        >
+          Commencer
+        </button>
       </div>
     </div>
   );

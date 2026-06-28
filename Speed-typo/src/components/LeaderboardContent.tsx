@@ -8,17 +8,15 @@ import {
   LeaderboardRow,
 } from '../lib/leaderboard';
 
-interface LeaderboardProps {
-  onBack: () => void;
-}
-
 const PERIODS: { key: LeaderboardPeriod; label: string }[] = [
-  { key: 'week', label: 'Cette semaine' },
-  { key: 'month', label: 'Ce mois' },
+  { key: 'week', label: 'Semaine' },
+  { key: 'month', label: 'Mois' },
   { key: 'all', label: 'Tout temps' },
 ];
 
-const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
+// Contenu du classement (sélecteurs + tableau), sans chrome de page.
+// Réutilisé par le dock repliable de l'accueil.
+const LeaderboardContent: React.FC = () => {
   const { user, configured } = useAuth();
   const [period, setPeriod] = useState<LeaderboardPeriod>('week');
   const [mode, setMode] = useState<GameMode>('classique');
@@ -47,28 +45,16 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
     mode === 'endless' ? `${value} m` : `${value} pts`;
 
   return (
-    <div className="max-w-2xl w-full">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-          Classement
-        </h1>
-        <button
-          onClick={onBack}
-          className="text-sm px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors"
-        >
-          Retour
-        </button>
-      </div>
-
+    <div>
       {/* Sélecteur de période */}
-      <div className="flex justify-center gap-2 mb-4 flex-wrap">
+      <div className="flex justify-center gap-2 mb-3 flex-wrap">
         {PERIODS.map((p) => (
           <button
             key={p.key}
             onClick={() => setPeriod(p.key)}
-            className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 shadow
+            className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200
               ${period === p.key
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow'
                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}
             `}
           >
@@ -77,12 +63,11 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
         ))}
       </div>
 
-      {/* Sélecteur de mode (réutilise le composant existant) */}
+      {/* Sélecteur de mode */}
       <GameModeSelector selectedMode={mode} onSelectMode={setMode} />
 
-      <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden mt-4">
-        {/* En-tête de tableau */}
-        <div className="grid grid-cols-[3rem_1fr_5rem_5rem] gap-2 px-4 py-3 text-xs text-gray-400 border-b border-gray-700">
+      <div className="bg-gray-900/60 rounded-lg overflow-hidden mt-3">
+        <div className="grid grid-cols-[2rem_1fr_4.5rem_3.5rem] gap-2 px-3 py-2 text-xs text-gray-400 border-b border-gray-700">
           <div>#</div>
           <div>Joueur</div>
           <div className="text-right">Score</div>
@@ -90,13 +75,13 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
         </div>
 
         {!configured ? (
-          <div className="px-4 py-10 text-center text-gray-400">
-            Le classement nécessite la connexion au serveur.
+          <div className="px-3 py-8 text-center text-gray-400 text-sm">
+            Connexion au serveur requise.
           </div>
         ) : loading ? (
-          <div className="px-4 py-10 text-center text-gray-400">Chargement…</div>
+          <div className="px-3 py-8 text-center text-gray-400 text-sm">Chargement…</div>
         ) : rows.length === 0 ? (
-          <div className="px-4 py-10 text-center text-gray-400">
+          <div className="px-3 py-8 text-center text-gray-400 text-sm">
             Aucun score sur cette période. Sois le premier !
           </div>
         ) : (
@@ -113,7 +98,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
             return (
               <div
                 key={row.user_id}
-                className={`grid grid-cols-[3rem_1fr_5rem_5rem] gap-2 px-4 py-3 items-center border-b border-gray-700/50 last:border-0
+                className={`grid grid-cols-[2rem_1fr_4.5rem_3.5rem] gap-2 px-3 py-2 items-center text-sm border-b border-gray-700/50 last:border-0
                   ${isMe ? 'bg-purple-500/10' : ''}
                 `}
               >
@@ -122,7 +107,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
                   <span className={isMe ? 'text-purple-300 font-semibold' : 'text-white'}>
                     {row.username}
                   </span>
-                  {isMe && <span className="text-xs text-purple-400 ml-2">(toi)</span>}
+                  {isMe && <span className="text-xs text-purple-400 ml-1">(toi)</span>}
                 </div>
                 <div className="text-right font-semibold text-green-400">
                   {formatScore(row.best_score)}
@@ -137,4 +122,4 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onBack }) => {
   );
 };
 
-export default Leaderboard;
+export default LeaderboardContent;

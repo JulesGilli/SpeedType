@@ -2,7 +2,7 @@ import { useState } from 'react';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import ResultScreen from './components/ResultScreen';
-import Leaderboard from './components/Leaderboard';
+import LeaderboardDock from './components/LeaderboardDock';
 import { GameMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
@@ -11,7 +11,7 @@ import { submitScore } from './lib/scores';
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error' | 'anon';
 
 function App() {
-  const [gameState, setGameState] = useState<'start' | 'playing' | 'result' | 'leaderboard'>('start');
+  const [gameState, setGameState] = useState<'start' | 'playing' | 'result'>('start');
   const [result, setResult] = useState<GameResult | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
@@ -43,16 +43,11 @@ function App() {
     setGameState('start');
   };
 
-  const showLeaderboard = () => {
-    setGameState('leaderboard');
-  };
-
   return (
     <div className="w-full min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
       {gameState === 'start' && (
         <StartScreen
           onStart={startGame}
-          onShowLeaderboard={showLeaderboard}
           selectedMode={selectedMode}
           setSelectedMode={setSelectedMode}
         />
@@ -65,14 +60,11 @@ function App() {
         />
       )}
       {gameState === 'result' && result && (
-        <ResultScreen
-          result={result}
-          saveStatus={saveStatus}
-          onRestart={restartGame}
-          onShowLeaderboard={showLeaderboard}
-        />
+        <ResultScreen result={result} saveStatus={saveStatus} onRestart={restartGame} />
       )}
-      {gameState === 'leaderboard' && <Leaderboard onBack={restartGame} />}
+
+      {/* Dock classement : toujours présent sur l'accueil */}
+      {gameState === 'start' && <LeaderboardDock />}
     </div>
   );
 }

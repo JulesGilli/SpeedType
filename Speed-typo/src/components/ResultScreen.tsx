@@ -5,7 +5,6 @@ interface ResultScreenProps {
   result: GameResult;
   saveStatus: SaveStatus;
   onRestart: () => void;
-  onShowLeaderboard: () => void;
 }
 
 const SaveStatusLine: React.FC<{ status: SaveStatus }> = ({ status }) => {
@@ -21,7 +20,7 @@ const SaveStatusLine: React.FC<{ status: SaveStatus }> = ({ status }) => {
   return <p className={`text-sm mb-4 ${entry.className}`}>{entry.text}</p>;
 };
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onRestart, onShowLeaderboard }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onRestart }) => {
   const { score, wordCount, accuracy, wpm } = result;
 
   const getMessage = () => {
@@ -65,20 +64,12 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, onResta
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-3 items-center">
-        <button
-          onClick={onRestart}
-          className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"
-        >
-          Play Again
-        </button>
-        <button
-          onClick={onShowLeaderboard}
-          className="text-sm text-gray-300 hover:text-white underline underline-offset-4 transition-colors"
-        >
-          Voir le classement
-        </button>
-      </div>
+      <button
+        onClick={onRestart}
+        className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"
+      >
+        Play Again
+      </button>
     </div>
   );
 };
