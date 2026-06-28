@@ -88,25 +88,31 @@ const LeaderboardContent: React.FC = () => {
         ))}
       </div>
 
-      {/* Sélecteur de période */}
-      <div className="flex justify-center gap-2 mb-3 flex-wrap">
-        {PERIODS.map((p) => (
-          <button
-            key={p.key}
-            onClick={() => setPeriod(p.key)}
-            className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200
-              ${period === p.key
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}
-            `}
-          >
-            {t(p.tkey)}
-          </button>
-        ))}
-      </div>
+      {/* Sélecteur de période (vue par mode uniquement) : le classement global
+          est mensuel par nature pour que les rangs se réinitialisent chaque mois. */}
+      {view === 'mode' && (
+        <div className="flex justify-center gap-2 mb-3 flex-wrap">
+          {PERIODS.map((p) => (
+            <button
+              key={p.key}
+              onClick={() => setPeriod(p.key)}
+              className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200
+                ${period === p.key
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}
+              `}
+            >
+              {t(p.tkey)}
+            </button>
+          ))}
+        </div>
+      )}
 
       {view === 'global' ? (
-        <GlobalLeaderboard period={period} />
+        <>
+          <p className="text-center text-xs text-gray-500 mb-3">{t('globalMonthlyHint')}</p>
+          <GlobalLeaderboard period="month" />
+        </>
       ) : (
       <>
       {/* Sélecteur de mode */}
