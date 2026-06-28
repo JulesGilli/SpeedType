@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import GameModeSelector from './GameModeSelector';
+import GlobalLeaderboard from './GlobalLeaderboard';
 import { GameMode } from '../types/GameMode';
 import { useAuth } from '../lib/AuthContext';
 import { useI18n } from '../lib/i18n';
@@ -14,10 +15,17 @@ import {
 // Nombre d'entrées affichées dans le classement principal.
 const TOP_N = 10;
 
+type View = 'mode' | 'global';
+
 const PERIODS: { key: LeaderboardPeriod; tkey: string }[] = [
   { key: 'week', tkey: 'periodWeek' },
   { key: 'month', tkey: 'periodMonth' },
   { key: 'all', tkey: 'periodAll' },
+];
+
+const VIEWS: { key: View; tkey: string }[] = [
+  { key: 'mode', tkey: 'viewByMode' },
+  { key: 'global', tkey: 'viewGlobal' },
 ];
 
 // Contenu du classement (sélecteurs + tableau), sans chrome de page.
@@ -25,6 +33,7 @@ const PERIODS: { key: LeaderboardPeriod; tkey: string }[] = [
 const LeaderboardContent: React.FC = () => {
   const { user, profile, configured } = useAuth();
   const { t } = useI18n();
+  const [view, setView] = useState<View>('mode');
   const [period, setPeriod] = useState<LeaderboardPeriod>('week');
   const [mode, setMode] = useState<GameMode>('classique');
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
@@ -32,7 +41,7 @@ const LeaderboardContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!configured) {
+    if (!configured || view !== 'mode') {
       setLoading(false);
       return;
     }
@@ -51,7 +60,7 @@ const LeaderboardContent: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [period, mode, configured, user]);
+  }, [period, mode, configured, user, view]);
 
   const top = rows.slice(0, TOP_N);
   // Le joueur figure-t-il déjà dans le top affiché ? (on compare les ids,
@@ -63,6 +72,23 @@ const LeaderboardContent: React.FC = () => {
 
   return (
     <div>
+      {/* Bascule Par mode / Global */}
+      <div className="flex justify-center gap-2 mb-3">
+        {VIEWS.map((v) => (
+          <button
+            key={v.key}
+            onClick={() => setView(v.key)}
+            className={`px-4 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200
+              ${view === v.key
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}
+            `}
+          >
+            {t(v.tkey)}
+          </button>
+        ))}
+      </div>
+
       {/* Sélecteur de période */}
       <div className="flex justify-center gap-2 mb-3 flex-wrap">
         {PERIODS.map((p) => (
@@ -80,6 +106,10 @@ const LeaderboardContent: React.FC = () => {
         ))}
       </div>
 
+      {view === 'global' ? (
+        <GlobalLeaderboard period={period} />
+      ) : (
+      <>
       {/* Sélecteur de mode */}
       <GameModeSelector selectedMode={mode} onSelectMode={setMode} />
 
@@ -171,6 +201,8 @@ const LeaderboardContent: React.FC = () => {
           )
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };

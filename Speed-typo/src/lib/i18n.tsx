@@ -44,6 +44,16 @@ const fr: Dict = {
   serverRequired: 'Connexion au serveur requise.',
   noScoresPeriod: 'Aucun score sur cette période. Sois le premier !',
   unranked: 'Non classé',
+  viewByMode: 'Par mode',
+  viewGlobal: 'Global',
+  colTotal: 'Total',
+  colRank: 'Rang',
+  tier_bronze: 'Bronze',
+  tier_silver: 'Argent',
+  tier_gold: 'Or',
+  tier_platinum: 'Platine',
+  tier_diamond: 'Diamant',
+  tier_master: 'Maître',
   tabChallenges: 'Défis du mois',
   tabRanking: 'Classement défis',
   yourChallengePoints: 'Tes points de défis ce mois :',
@@ -104,6 +114,16 @@ const en: Dict = {
   serverRequired: 'Server connection required.',
   noScoresPeriod: 'No score for this period. Be the first!',
   unranked: 'Unranked',
+  viewByMode: 'By mode',
+  viewGlobal: 'Global',
+  colTotal: 'Total',
+  colRank: 'Rank',
+  tier_bronze: 'Bronze',
+  tier_silver: 'Silver',
+  tier_gold: 'Gold',
+  tier_platinum: 'Platinum',
+  tier_diamond: 'Diamond',
+  tier_master: 'Master',
   tabChallenges: 'Challenges',
   tabRanking: 'Challenge ranking',
   yourChallengePoints: 'Your challenge points this month:',
@@ -164,6 +184,16 @@ const es: Dict = {
   serverRequired: 'Se requiere conexión al servidor.',
   noScoresPeriod: 'Sin puntuaciones en este periodo. ¡Sé el primero!',
   unranked: 'Sin clasificar',
+  viewByMode: 'Por modo',
+  viewGlobal: 'Global',
+  colTotal: 'Total',
+  colRank: 'Rango',
+  tier_bronze: 'Bronce',
+  tier_silver: 'Plata',
+  tier_gold: 'Oro',
+  tier_platinum: 'Platino',
+  tier_diamond: 'Diamante',
+  tier_master: 'Maestro',
   tabChallenges: 'Retos del mes',
   tabRanking: 'Clasificación de retos',
   yourChallengePoints: 'Tus puntos de retos este mes:',
@@ -224,6 +254,16 @@ const de: Dict = {
   serverRequired: 'Serververbindung erforderlich.',
   noScoresPeriod: 'Keine Punkte in diesem Zeitraum. Sei der Erste!',
   unranked: 'Nicht platziert',
+  viewByMode: 'Nach Modus',
+  viewGlobal: 'Global',
+  colTotal: 'Gesamt',
+  colRank: 'Rang',
+  tier_bronze: 'Bronze',
+  tier_silver: 'Silber',
+  tier_gold: 'Gold',
+  tier_platinum: 'Platin',
+  tier_diamond: 'Diamant',
+  tier_master: 'Meister',
   tabChallenges: 'Challenges',
   tabRanking: 'Challenge-Rangliste',
   yourChallengePoints: 'Deine Challenge-Punkte diesen Monat:',
@@ -284,6 +324,16 @@ const it: Dict = {
   serverRequired: 'Connessione al server richiesta.',
   noScoresPeriod: 'Nessun punteggio in questo periodo. Sii il primo!',
   unranked: 'Non classificato',
+  viewByMode: 'Per modalità',
+  viewGlobal: 'Globale',
+  colTotal: 'Totale',
+  colRank: 'Grado',
+  tier_bronze: 'Bronzo',
+  tier_silver: 'Argento',
+  tier_gold: 'Oro',
+  tier_platinum: 'Platino',
+  tier_diamond: 'Diamante',
+  tier_master: 'Maestro',
   tabChallenges: 'Sfide del mese',
   tabRanking: 'Classifica sfide',
   yourChallengePoints: 'I tuoi punti sfida questo mese:',
@@ -366,36 +416,145 @@ const MODE_DESC: Record<Lang, Partial<Record<GameMode, string[]>>> = {
   },
 };
 
-// Phrases du mode "Phrase infinie", par langue (lettres + espaces uniquement,
+// ---------------------------------------------------------------------------
+// Défis : les titres/descriptions sont stockés en français dans la base. On les
+// retraduit côté client à partir des champs structurés (goal_type/value/mode).
+// Clé stable = `${goal_type}_${goal_value}_${mode ?? 'any'}` (unique par template).
+// ---------------------------------------------------------------------------
+const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
+  fr: {
+    games_1_any: 'Échauffement', wpm_25_any: 'Petit doigté', words_15_any: 'Bavard',
+    score_800_classique: 'Premiers pas', wpm_40_any: 'Doigts agiles', score_2000_classique: 'Bon score',
+    combo_5_any: 'Combo x5', words_30_any: 'Machine à écrire', score_1500_leet: 'Leet initié',
+    wpm_60_any: 'Vitesse éclair', score_4000_classique: 'Gros score', combo_10_any: 'Combo x10',
+    score_2500_inversé: 'Cerveau inversé', accuracy_95_any: 'Précision', wpm_80_any: 'Surhumain',
+    accuracy_100_any: 'Sans-faute', score_6000_classique: 'Légende', combo_15_any: 'Combo démentiel',
+    score_3000_memoire: "Mémoire d'éléphant",
+  },
+  en: {
+    games_1_any: 'Warm-up', wpm_25_any: 'Light touch', words_15_any: 'Chatterbox',
+    score_800_classique: 'First steps', wpm_40_any: 'Nimble fingers', score_2000_classique: 'Good score',
+    combo_5_any: 'Combo x5', words_30_any: 'Typewriter', score_1500_leet: 'Leet initiate',
+    wpm_60_any: 'Lightning speed', score_4000_classique: 'Big score', combo_10_any: 'Combo x10',
+    score_2500_inversé: 'Reversed brain', accuracy_95_any: 'Precision', wpm_80_any: 'Superhuman',
+    accuracy_100_any: 'Flawless', score_6000_classique: 'Legend', combo_15_any: 'Insane combo',
+    score_3000_memoire: 'Elephant memory',
+  },
+  es: {
+    games_1_any: 'Calentamiento', wpm_25_any: 'Toque ligero', words_15_any: 'Parlanchín',
+    score_800_classique: 'Primeros pasos', wpm_40_any: 'Dedos ágiles', score_2000_classique: 'Buena puntuación',
+    combo_5_any: 'Combo x5', words_30_any: 'Máquina de escribir', score_1500_leet: 'Iniciado leet',
+    wpm_60_any: 'Velocidad relámpago', score_4000_classique: 'Gran puntuación', combo_10_any: 'Combo x10',
+    score_2500_inversé: 'Cerebro invertido', accuracy_95_any: 'Precisión', wpm_80_any: 'Sobrehumano',
+    accuracy_100_any: 'Sin errores', score_6000_classique: 'Leyenda', combo_15_any: 'Combo demencial',
+    score_3000_memoire: 'Memoria de elefante',
+  },
+  de: {
+    games_1_any: 'Aufwärmen', wpm_25_any: 'Leichter Anschlag', words_15_any: 'Plappermaul',
+    score_800_classique: 'Erste Schritte', wpm_40_any: 'Flinke Finger', score_2000_classique: 'Gute Punktzahl',
+    combo_5_any: 'Combo x5', words_30_any: 'Schreibmaschine', score_1500_leet: 'Leet-Neuling',
+    wpm_60_any: 'Blitzgeschwindigkeit', score_4000_classique: 'Große Punktzahl', combo_10_any: 'Combo x10',
+    score_2500_inversé: 'Umgekehrtes Hirn', accuracy_95_any: 'Präzision', wpm_80_any: 'Übermenschlich',
+    accuracy_100_any: 'Fehlerfrei', score_6000_classique: 'Legende', combo_15_any: 'Wahnsinns-Combo',
+    score_3000_memoire: 'Elefantengedächtnis',
+  },
+  it: {
+    games_1_any: 'Riscaldamento', wpm_25_any: 'Tocco leggero', words_15_any: 'Chiacchierone',
+    score_800_classique: 'Primi passi', wpm_40_any: 'Dita agili', score_2000_classique: 'Buon punteggio',
+    combo_5_any: 'Combo x5', words_30_any: 'Macchina da scrivere', score_1500_leet: 'Iniziato leet',
+    wpm_60_any: 'Velocità fulminea', score_4000_classique: 'Gran punteggio', combo_10_any: 'Combo x10',
+    score_2500_inversé: 'Cervello invertito', accuracy_95_any: 'Precisione', wpm_80_any: 'Sovrumano',
+    accuracy_100_any: 'Senza errori', score_6000_classique: 'Leggenda', combo_15_any: 'Combo folle',
+    score_3000_memoire: "Memoria d'elefante",
+  },
+};
+
+type DescFn = (v: number, mode: string) => string;
+const CHALLENGE_DESC: Record<Lang, Record<string, DescFn>> = {
+  fr: {
+    games: (v) => `Termine ${v === 1 ? 'une partie' : `${v} parties`}`,
+    wpm: (v) => `Atteins ${v} WPM dans une partie`,
+    words: (v) => `Tape ${v} mots dans une partie`,
+    score: (v, m) => `Marque ${v} points en ${m}`,
+    combo: (v) => `Enchaîne un combo de ${v}`,
+    accuracy: (v) => `Termine une partie de 20+ mots à ${v}% de précision`,
+  },
+  en: {
+    games: (v) => `Finish ${v === 1 ? 'a game' : `${v} games`}`,
+    wpm: (v) => `Reach ${v} WPM in a game`,
+    words: (v) => `Type ${v} words in a game`,
+    score: (v, m) => `Score ${v} points in ${m}`,
+    combo: (v) => `Chain a combo of ${v}`,
+    accuracy: (v) => `Finish a 20+ word game at ${v}% accuracy`,
+  },
+  es: {
+    games: (v) => `Termina ${v === 1 ? 'una partida' : `${v} partidas`}`,
+    wpm: (v) => `Alcanza ${v} PPM en una partida`,
+    words: (v) => `Escribe ${v} palabras en una partida`,
+    score: (v, m) => `Marca ${v} puntos en ${m}`,
+    combo: (v) => `Encadena un combo de ${v}`,
+    accuracy: (v) => `Termina una partida de 20+ palabras con ${v}% de precisión`,
+  },
+  de: {
+    games: (v) => `Beende ${v === 1 ? 'ein Spiel' : `${v} Spiele`}`,
+    wpm: (v) => `Erreiche ${v} WPM in einem Spiel`,
+    words: (v) => `Tippe ${v} Wörter in einem Spiel`,
+    score: (v, m) => `Erziele ${v} Punkte in ${m}`,
+    combo: (v) => `Verkette ein Combo von ${v}`,
+    accuracy: (v) => `Beende ein Spiel mit 20+ Wörtern bei ${v}% Genauigkeit`,
+  },
+  it: {
+    games: (v) => `Completa ${v === 1 ? 'una partita' : `${v} partite`}`,
+    wpm: (v) => `Raggiungi ${v} PPM in una partita`,
+    words: (v) => `Scrivi ${v} parole in una partita`,
+    score: (v, m) => `Segna ${v} punti in ${m}`,
+    combo: (v) => `Concatena un combo di ${v}`,
+    accuracy: (v) => `Completa una partita di 20+ parole al ${v}% di precisione`,
+  },
+};
+
+export interface ChallengeI18nInput {
+  goal_type: string;
+  goal_value: number;
+  mode: string | null;
+}
+
+// Les titres sont stockés en français dans la base : on inverse la table FR
+// (titre français -> slug) pour retraduire un titre déjà claim (ResultScreen).
+const FR_TITLE_TO_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(CHALLENGE_TITLES.fr).map(([slug, title]) => [title, slug])
+);
+
+// Phrases du mode "Phrase infinie", par langue (lettres + espaces + apostrophes,
 // sans accents pour une frappe fluide).
 export const ENDLESS_PHRASES: Record<Lang, string[]> = {
   fr: [
-    'le sigma se reveille a cinq heures pour aller chercher le pain',
+    "le sigma se reveille a l'aube pour aller chercher le pain",
     'ne fais jamais confiance a un npc qui distribue du rizz gratuit',
-    'le gigachad traverse l ohio sans jamais perdre son aura',
-    'chaque combo parfait remplit la salle d une energie cosmique',
-    'tape vite et laisse les mots tomber comme une pluie de meteores',
-    'la galaxie entiere retient son souffle quand tu lances un record',
+    "le gigachad traverse l'ohio sans jamais perdre son aura",
+    "chaque combo parfait remplit la salle d'une energie cosmique",
+    "tape vite et laisse les mots tomber comme une pluie d'etoiles",
+    "le monde entier retient son souffle jusqu'a ton prochain record",
     'skibidi toilet a encore envahi le serveur pendant la nuit',
     'garde ton calme respire et enchaine les frappes avec precision',
-    'les doigts dansent sur le clavier plus vite que la lumiere',
-    'un vrai champion ne regarde jamais ses touches il sent le rythme',
+    "aujourd'hui c'est toi le main character alors n'abandonne pas",
+    "un vrai champion n'a pas besoin de regarder ses touches",
     'le mode infini ne pardonne aucune hesitation alors reste concentre',
-    'la vitesse se construit une frappe a la fois alors respecte le grind',
+    "la vitesse se construit une frappe a la fois alors respecte l'effort",
   ],
   en: [
     'the sigma wakes up at five to grab the morning bread',
-    'never trust an npc who hands out free rizz',
+    "never trust an npc who's handing out free rizz",
     'the gigachad walks through ohio without losing his aura',
     'every perfect combo fills the room with cosmic energy',
     'type fast and let the words fall like a meteor shower',
-    'the whole galaxy holds its breath when you set a record',
+    "the whole galaxy holds its breath when you're chasing a record",
     'skibidi toilet invaded the server again last night',
     'stay calm breathe and chain your keystrokes with precision',
-    'your fingers dance on the keyboard faster than light',
-    'a real champion never looks at the keys he feels the rhythm',
+    "a real champion doesn't look at the keys he feels the rhythm",
+    "don't stop typing and don't you dare touch grass",
     'the endless mode forgives no hesitation so stay focused',
-    'speed is built one keystroke at a time so respect the grind',
+    "speed is built one keystroke at a time so don't skip the grind",
   ],
   es: [
     'el sigma se levanta a las cinco para comprar el pan',
@@ -417,7 +576,7 @@ export const ENDLESS_PHRASES: Record<Lang, string[]> = {
     'der gigachad geht durch ohio ohne seine aura zu verlieren',
     'jedes perfekte combo fuellt den raum mit kosmischer energie',
     'tippe schnell und lass die woerter wie meteore fallen',
-    'die ganze galaxie haelt den atem an bei deinem rekord',
+    "die ganze galaxie haelt den atem an wenn's um deinen rekord geht",
     'skibidi toilet hat letzte nacht wieder den server geflutet',
     'bleib ruhig atme und reihe die tasten mit praezision aneinander',
     'deine finger tanzen schneller als das licht auf der tastatur',
@@ -427,17 +586,17 @@ export const ENDLESS_PHRASES: Record<Lang, string[]> = {
   ],
   it: [
     'il sigma si sveglia alle cinque per prendere il pane',
-    'non fidarti mai di un npc che regala rizz gratis',
+    "non fidarti mai di un npc che regala un'aura gratis",
     'il gigachad attraversa ohio senza perdere la sua aura',
-    'ogni combo perfetto riempie la stanza di energia cosmica',
+    "ogni combo perfetto riempie la stanza d'energia cosmica",
     'scrivi veloce e lascia cadere le parole come meteore',
-    'tutta la galassia trattiene il fiato quando fai un record',
+    "tutta la galassia trattiene il fiato fino all'ultimo record",
     'skibidi toilet ha invaso il server di nuovo stanotte',
     'resta calmo respira e concatena i tasti con precisione',
     'le tue dita danzano sulla tastiera piu veloci della luce',
     'un vero campione non guarda i tasti sente il ritmo',
-    'la modalita infinita non perdona le esitazioni resta concentrato',
-    'la velocita si costruisce un tasto alla volta rispetta il grind',
+    "la modalita infinita non perdona l'esitazione resta concentrato",
+    "la velocita si costruisce un tasto alla volta rispetta l'impegno",
   ],
 };
 
@@ -447,6 +606,8 @@ interface I18nValue {
   t: (key: string) => string;
   modeLabel: (m: GameMode) => string;
   modeDesc: (m: GameMode) => string[];
+  challengeText: (c: ChallengeI18nInput) => { title: string; description: string };
+  challengeTitle: (frTitle: string) => string;
 }
 
 const I18nContext = createContext<I18nValue | undefined>(undefined);
@@ -470,8 +631,30 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const modeLabel = (m: GameMode) => MODE_LABELS[lang][m] ?? m;
   const modeDesc = (m: GameMode) => MODE_DESC[lang][m] ?? MODE_DESC.en[m] ?? [];
 
+  const challengeText = (c: ChallengeI18nInput) => {
+    const slug = `${c.goal_type}_${c.goal_value}_${c.mode ?? 'any'}`;
+    const title =
+      CHALLENGE_TITLES[lang][slug] ?? CHALLENGE_TITLES.en[slug] ?? slug;
+    const descFn =
+      (CHALLENGE_DESC[lang] ?? CHALLENGE_DESC.en)[c.goal_type] ??
+      CHALLENGE_DESC.en[c.goal_type];
+    const description = descFn
+      ? descFn(c.goal_value, c.mode ? modeLabel(c.mode as GameMode) : '')
+      : '';
+    return { title, description };
+  };
+
+  // Retraduit un titre de défi déjà stocké en français (liste des défis validés).
+  const challengeTitle = (frTitle: string) => {
+    const slug = FR_TITLE_TO_SLUG[frTitle];
+    if (!slug) return frTitle;
+    return CHALLENGE_TITLES[lang][slug] ?? frTitle;
+  };
+
   return (
-    <I18nContext.Provider value={{ lang, setLang, t, modeLabel, modeDesc }}>
+    <I18nContext.Provider
+      value={{ lang, setLang, t, modeLabel, modeDesc, challengeText, challengeTitle }}
+    >
       {children}
     </I18nContext.Provider>
   );

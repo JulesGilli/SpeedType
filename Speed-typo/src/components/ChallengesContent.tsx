@@ -19,7 +19,7 @@ type Tab = 'list' | 'ranking';
 
 const ChallengesContent: React.FC = () => {
   const { user, profile, configured } = useAuth();
-  const { t } = useI18n();
+  const { t, challengeText } = useI18n();
   const [tab, setTab] = useState<Tab>('list');
   const [challenges, setChallenges] = useState<ChallengeRow[]>([]);
   const [ranking, setRanking] = useState<ChallengeRankRow[]>([]);
@@ -89,6 +89,7 @@ const ChallengesContent: React.FC = () => {
               {challenges.map((c) => {
                 const diffClass = DIFFICULTY_CLASS[c.difficulty] ?? 'text-gray-400';
                 const diffLabel = t(`diff_${c.difficulty}`);
+                const { title, description } = challengeText(c);
                 return (
                   <div
                     key={c.id}
@@ -98,10 +99,10 @@ const ChallengesContent: React.FC = () => {
                     `}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-white text-sm">{c.title}</span>
+                      <span className="font-semibold text-white text-sm">{title}</span>
                       <span className={`text-xs font-bold ${diffClass}`}>{diffLabel}</span>
                     </div>
-                    <div className="text-xs text-gray-400 mt-1">{c.description}</div>
+                    <div className="text-xs text-gray-400 mt-1">{description}</div>
                     <div className="flex items-center justify-between mt-2 text-xs">
                       <span className="text-gray-500">{c.base_points} {t('basePoints')}</span>
                       {c.completed ? (

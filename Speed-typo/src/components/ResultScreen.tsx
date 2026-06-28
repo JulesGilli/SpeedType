@@ -20,7 +20,7 @@ const SAVE_KEY: Record<SaveStatus, { key: string; className: string } | null> = 
 
 const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed, onRestart }) => {
   const { score, wordCount, accuracy, wpm } = result;
-  const { t } = useI18n();
+  const { t, challengeTitle } = useI18n();
 
   const message = () => {
     if (score >= 500 && accuracy >= 90) return t('msg1');
@@ -70,7 +70,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed
           <ul className="space-y-1">
             {claimed.map((c) => (
               <li key={c.challenge_id} className="flex justify-between text-sm">
-                <span className="text-gray-200">{c.title}</span>
+                <span className="text-gray-200">{challengeTitle(c.title)}</span>
                 <span className="text-purple-400 font-semibold">+{c.points_earned} pts</span>
               </li>
             ))}
