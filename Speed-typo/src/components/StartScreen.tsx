@@ -1,5 +1,6 @@
 import React from 'react';
 import GameModeSelector from './GameModeSelector';
+import AuthBar from './AuthBar';
 import { GameMode } from '../types/GameMode';
 
 interface StartScreenProps {
@@ -47,6 +48,8 @@ const StartScreen: React.FC<StartScreenProps> = ({
 }) => {
   return (
     <div className="max-w-md w-full text-center">
+      <AuthBar />
+
       <h1 className="text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
         Speed Typo
       </h1>
