@@ -433,6 +433,7 @@ const MODE_DESC: Record<Lang, Partial<Record<GameMode, string[]>>> = {
 // ---------------------------------------------------------------------------
 const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
   fr: {
+    games_3_any: 'Échauffement', wpm_35_any: 'Petit doigté', words_25_any: 'Bavard', score_1200_classique: 'Premiers pas',
     games_1_any: 'Échauffement', wpm_25_any: 'Petit doigté', words_15_any: 'Bavard',
     score_800_classique: 'Premiers pas', wpm_40_any: 'Doigts agiles', score_2000_classique: 'Bon score',
     combo_5_any: 'Combo x5', words_30_any: 'Machine à écrire', score_1500_leet: 'Leet initié',
@@ -442,6 +443,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_3000_memoire: "Mémoire d'éléphant",
   },
   en: {
+    games_3_any: 'Warm-up', wpm_35_any: 'Light touch', words_25_any: 'Chatterbox', score_1200_classique: 'First steps',
     games_1_any: 'Warm-up', wpm_25_any: 'Light touch', words_15_any: 'Chatterbox',
     score_800_classique: 'First steps', wpm_40_any: 'Nimble fingers', score_2000_classique: 'Good score',
     combo_5_any: 'Combo x5', words_30_any: 'Typewriter', score_1500_leet: 'Leet initiate',
@@ -451,6 +453,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_3000_memoire: 'Elephant memory',
   },
   es: {
+    games_3_any: 'Calentamiento', wpm_35_any: 'Toque ligero', words_25_any: 'Parlanchín', score_1200_classique: 'Primeros pasos',
     games_1_any: 'Calentamiento', wpm_25_any: 'Toque ligero', words_15_any: 'Parlanchín',
     score_800_classique: 'Primeros pasos', wpm_40_any: 'Dedos ágiles', score_2000_classique: 'Buena puntuación',
     combo_5_any: 'Combo x5', words_30_any: 'Máquina de escribir', score_1500_leet: 'Iniciado leet',
@@ -460,6 +463,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_3000_memoire: 'Memoria de elefante',
   },
   de: {
+    games_3_any: 'Aufwärmen', wpm_35_any: 'Leichter Anschlag', words_25_any: 'Plappermaul', score_1200_classique: 'Erste Schritte',
     games_1_any: 'Aufwärmen', wpm_25_any: 'Leichter Anschlag', words_15_any: 'Plappermaul',
     score_800_classique: 'Erste Schritte', wpm_40_any: 'Flinke Finger', score_2000_classique: 'Gute Punktzahl',
     combo_5_any: 'Combo x5', words_30_any: 'Schreibmaschine', score_1500_leet: 'Leet-Neuling',
@@ -469,6 +473,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_3000_memoire: 'Elefantengedächtnis',
   },
   it: {
+    games_3_any: 'Riscaldamento', wpm_35_any: 'Tocco leggero', words_25_any: 'Chiacchierone', score_1200_classique: 'Primi passi',
     games_1_any: 'Riscaldamento', wpm_25_any: 'Tocco leggero', words_15_any: 'Chiacchierone',
     score_800_classique: 'Primi passi', wpm_40_any: 'Dita agili', score_2000_classique: 'Buon punteggio',
     combo_5_any: 'Combo x5', words_30_any: 'Macchina da scrivere', score_1500_leet: 'Iniziato leet',
