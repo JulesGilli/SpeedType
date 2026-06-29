@@ -7,6 +7,7 @@ import {
   GlobalRow,
   MyGlobalRow,
 } from '../lib/leaderboard';
+import { HARDCORE_MIN } from '../lib/rank';
 
 const TOP_N = 10;
 
@@ -25,8 +26,8 @@ const HardcoreLeaderboard: React.FC = () => {
     }
     let cancelled = false;
     Promise.all([
-      fetchHardcoreLeaderboard(),
-      user ? fetchMyHardcore() : Promise.resolve(null),
+      fetchHardcoreLeaderboard(HARDCORE_MIN),
+      user ? fetchMyHardcore(HARDCORE_MIN) : Promise.resolve(null),
     ]).then(([data, m]) => {
       if (!cancelled) {
         setRows(data);

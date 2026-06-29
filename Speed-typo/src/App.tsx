@@ -6,7 +6,7 @@ import HardcoreScreen from './components/HardcoreScreen';
 import GameScreen from './components/GameScreen';
 import ResultScreen from './components/ResultScreen';
 import LeaderboardDock from './components/LeaderboardDock';
-import ChallengesDock from './components/ChallengesDock';
+import RankingDock from './components/RankingDock';
 import Background from './components/Background';
 import BackgroundToggle from './components/BackgroundToggle';
 import LanguageSelector from './components/LanguageSelector';
@@ -17,7 +17,7 @@ import { GameMode, PlayMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
 import { submitScore } from './lib/scores';
-import { claimChallenges, ClaimedChallenge } from './lib/challenges';
+import { ClaimedChallenge } from './lib/challenges';
 import { fetchMyGlobal } from './lib/leaderboard';
 import { isHardcoreUnlocked } from './lib/rank';
 
@@ -114,10 +114,6 @@ function App() {
     setSaveStatus('saving');
     submitScore(gameResult, user.id).then(({ error }) => {
       setSaveStatus(error ? 'error' : 'saved');
-      // Les défis ne se valident que sur les modes normaux (pas en hardcore).
-      if (!error && !hardcore) {
-        claimChallenges().then(setClaimed);
-      }
     });
   };
 
@@ -201,7 +197,7 @@ function App() {
                   }}
                 />
                 <LeaderboardDock />
-                <ChallengesDock />
+                <RankingDock />
               </>
             )}
           </motion.div>
