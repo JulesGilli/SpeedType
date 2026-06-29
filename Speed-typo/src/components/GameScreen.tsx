@@ -3,7 +3,7 @@ import WordDisplay from './WordDisplay';
 import ParticleEffect from './ParticleEffect';
 import FloatingScore from './FloatingScore';
 import { getRandomWord, modifyWord, calculateScore, computeWpm } from '../utils/gameUtils';
-import { GameMode } from '../types/GameMode';
+import { PlayMode } from '../types/GameMode';
 import { GameResult } from '../types/GameResult';
 import { useI18n } from '../lib/i18n';
 import EndlessPhraseGame from './EndlessPhraseGame';
@@ -12,16 +12,22 @@ const GAME_DURATION = 60;
 
 interface GameScreenProps {
   onGameEnd: (result: GameResult) => void;
-  selectedMode: GameMode;
+  selectedMode: PlayMode;
   onStop: () => void;
+  hardcore?: boolean;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop }) => {
+const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop, hardcore = false }) => {
   if (selectedMode === 'endless') {
     return <EndlessPhraseGame onGameEnd={onGameEnd} onStop={onStop} />;
   }
 
   const { t } = useI18n();
+  // Comportements combinés (mode Chaos = tous à la fois) + mort subite.
+  const isMemory = selectedMode === 'memoire' || selectedMode === 'chaos';
+  const isBlind = selectedMode === 'blind' || selectedMode === 'chaos';
+  const isSudden = selectedMode === 'sudden';
+  const endedRef = useRef(false);
   const [modifiedWord, setModifiedWord] = useState('');
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState(0);
@@ -65,29 +71,31 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     return () => clearInterval(timerInterval);
   }, []);
 
-  useEffect(() => {
-    if (timeLeft === 0) {
-      const accuracy = attempts > 0 ? Math.round((wordsCompleted / attempts) * 100) : 0;
-      onGameEnd({
-        mode: selectedMode,
-        score,
-        wordCount: wordsCompleted,
-        accuracy,
-        wpm: computeWpm(correctChars, GAME_DURATION),
-        maxCombo,
-        durationSec: GAME_DURATION,
-      });
+  // Termine la partie (fin du temps OU mort subite) avec les stats courantes.
+  const finishGame = () => {
+    if (endedRef.current) return;
+    endedRef.current = true;
+    const accuracy = attempts > 0 ? Math.round((wordsCompleted / attempts) * 100) : (wordsCompleted > 0 ? 100 : 0);
+    onGameEnd({
+      mode: selectedMode,
+      score,
+      wordCount: wordsCompleted,
+      accuracy,
+      wpm: computeWpm(correctChars, GAME_DURATION),
+      maxCombo,
+      durationSec: GAME_DURATION,
+    });
+    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+  };
 
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-    }
+  useEffect(() => {
+    if (timeLeft === 0) finishGame();
   }, [timeLeft]);
 
   const generateNewWord = () => {
     const word = getRandomWord(selectedMode);
-    const includeNumbers = selectedMode === 'leet';
-    const reverseWords = selectedMode === 'inversé';
+    const includeNumbers = selectedMode === 'leet' || selectedMode === 'chaos';
+    const reverseWords = selectedMode === 'inversé' || selectedMode === 'chaos';
     const { modified, isLeet, isReversed } = modifyWord(word, includeNumbers, reverseWords);
 
     setModifiedWord(modified);
@@ -96,7 +104,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     setWasLeet(isLeet);
     setWasReversed(isReversed);
 
-    if (selectedMode === 'memoire') {
+    if (isMemory) {
       setShowWord(true);
       setWordVisibleTimeLeft(memoryDisplayTime); // initialise le temps visible
       if (hideTimeoutRef.current) {
@@ -149,8 +157,8 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       setCorrectChars(prev => prev + modifiedWord.length);
       setAttempts(prev => prev + 1);
 
-      // ✅ Réduction du temps d'affichage si mode mémoire
-      if (selectedMode === 'memoire') {
+      // ✅ Réduction du temps d'affichage si mode mémoire/chaos
+      if (isMemory) {
         setMemoryDisplayTime(prev => Math.max(0.5, prev - 0.1));
       }
 
@@ -171,12 +179,18 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       setTimeout(() => setShowEffect(false), 1000);
       generateNewWord();
     } else {
+      // ☠️ Mort subite : la moindre faute termine la partie.
+      if (isSudden) {
+        finishGame();
+        return;
+      }
+
       setComboCount(0);
       setAttempts(prev => prev + 1);
       setUserInput('');
 
-      // ❌ Reset du timer si on se trompe en mode mémoire
-      if (selectedMode === 'memoire') {
+      // ❌ Reset du timer si on se trompe en mode mémoire/chaos
+      if (isMemory) {
         setMemoryDisplayTime(1.5);
       }
 
@@ -185,7 +199,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
   };
 
   useEffect(() => {
-    if (selectedMode === 'memoire' && showWord) {
+    if (isMemory && showWord) {
       const interval = setInterval(() => {
         setWordVisibleTimeLeft(prev => {
           if (prev <= 0.1) {
@@ -204,6 +218,12 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     const cleanedInput = userInput.trim().toLowerCase();
     const cleanedTarget = modifiedWord.toLowerCase();
 
+    // Mort subite : dès qu'un caractère tapé ne correspond plus, c'est fini.
+    if (isSudden && cleanedInput.length > 0 && !cleanedTarget.startsWith(cleanedInput)) {
+      finishGame();
+      return;
+    }
+
     if (cleanedInput === cleanedTarget || userInput.length > modifiedWord.length) {
       validateInput();
     }
@@ -217,7 +237,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       {fallingWords.map(w => (
         <span
           key={w.id}
-          className="absolute top-[38%] -translate-x-1/2 text-2xl font-bold text-purple-300 animate-fall whitespace-nowrap"
+          className={`absolute top-[38%] -translate-x-1/2 text-2xl font-bold animate-fall whitespace-nowrap ${hardcore ? 'text-red-300' : 'text-purple-300'}`}
           style={{ left: `${w.left}%`, ['--fall-rot' as any]: `${w.rot}deg` }}
         >
           {w.text}
@@ -228,7 +248,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
     <div className="max-w-2xl w-full">
       <div className="flex justify-between items-center mb-8">
         <div className="text-xl font-bold">
-          {t('score')}: <span className="text-purple-400 animate-pulse">{score}</span>
+          {t('score')}: <span className={`animate-pulse ${hardcore ? 'text-red-400' : 'text-purple-400'}`}>{score}</span>
         </div>
         <div className="text-xl font-bold">
           {t('time')}:{' '}
@@ -247,6 +267,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       <div className={`
         bg-gray-800 p-6 rounded-lg shadow-lg relative overflow-hidden
         transition-transform duration-50
+        ${hardcore ? 'ring-1 ring-red-500/40' : ''}
         ${screenShake ? 'animate-shake' : ''}
       `}>
         {showEffect && effectType !== '' && (
@@ -281,10 +302,10 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
             )}
           </div>
 
-          {selectedMode === 'memoire' && showWord && (
+          {isMemory && showWord && (
             <div className="w-full bg-gray-700 h-2 rounded overflow-hidden mt-4">
               <div
-                className="bg-purple-500 h-full transition-all duration-100"
+                className={`h-full transition-all duration-100 ${hardcore ? 'bg-red-500' : 'bg-purple-500'}`}
                 style={{ width: `${(wordVisibleTimeLeft / memoryDisplayTime) * 100}%` }}
               />
             </div>
@@ -301,7 +322,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
                 validateInput();
               }
             }}
-            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 hover:bg-gray-600 ${selectedMode === 'blind' ? 'text-transparent caret-white' : 'text-white'
+            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 hover:bg-gray-600 ${hardcore ? 'focus:ring-red-500' : 'focus:ring-purple-500'} ${isBlind ? 'text-transparent caret-white' : 'text-white'
               }`}
           />
 

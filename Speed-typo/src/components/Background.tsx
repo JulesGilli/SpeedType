@@ -2,11 +2,13 @@ import Dither from './Dither';
 
 interface BackgroundProps {
   enabled: boolean;
+  hardcore?: boolean;
 }
 
 // Fond accordé à la palette de l'UI (violet -> rose).
 // `enabled=false` : on n'affiche que le dégradé statique (aucun rendu GPU/canvas).
-const Background: React.FC<BackgroundProps> = ({ enabled }) => (
+// `hardcore` : superpose un voile rouge qui apparaît en fondu (mode Hardcore).
+const Background: React.FC<BackgroundProps> = ({ enabled, hardcore = false }) => (
   <div className="fixed inset-0 z-0 pointer-events-none">
     {enabled && (
       <Dither
@@ -36,6 +38,17 @@ const Background: React.FC<BackgroundProps> = ({ enabled }) => (
     <div
       className="absolute inset-0"
       style={{ boxShadow: 'inset 0 0 220px 70px rgba(0,0,0,0.55)' }}
+    />
+
+    {/* Voile rouge du mode Hardcore (fondu doux). */}
+    <div
+      className="absolute inset-0 transition-opacity duration-700 ease-in-out"
+      style={{
+        opacity: hardcore ? 1 : 0,
+        background:
+          'radial-gradient(120% 90% at 50% 0%, rgba(239,68,68,0.30), transparent 60%),' +
+          'linear-gradient(180deg, rgba(60,5,5,0.55), rgba(30,2,2,0.75))',
+      }}
     />
   </div>
 );

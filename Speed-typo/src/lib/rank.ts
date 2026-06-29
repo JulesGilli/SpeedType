@@ -29,3 +29,7 @@ export function getTier(score: number): Tier {
 export function nextTier(score: number): Tier | null {
   return TIERS.find((tier) => tier.min > score) ?? null;
 }
+
+// Le mode Hardcore se débloque au rang Master.
+export const HARDCORE_MIN = TIERS.find((t) => t.key === 'master')?.min ?? Infinity;
+export const isHardcoreUnlocked = (globalScore: number) => globalScore >= HARDCORE_MIN;

@@ -8,6 +8,7 @@ interface ResultScreenProps {
   saveStatus: SaveStatus;
   claimed: ClaimedChallenge[];
   onRestart: () => void;
+  hardcore?: boolean;
 }
 
 const SAVE_KEY: Record<SaveStatus, { key: string; className: string } | null> = {
@@ -18,9 +19,13 @@ const SAVE_KEY: Record<SaveStatus, { key: string; className: string } | null> = 
   anon: { key: 'saveAnon', className: 'text-yellow-400' },
 };
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed, onRestart }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed, onRestart, hardcore = false }) => {
   const { score, wordCount, accuracy, wpm } = result;
   const { t, challengeTitle } = useI18n();
+  const gradient = hardcore ? 'from-red-500 to-orange-500' : 'from-purple-400 to-pink-600';
+  const btnGradient = hardcore
+    ? 'from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700'
+    : 'from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600';
 
   const message = () => {
     if (score >= 500 && accuracy >= 90) return t('msg1');
@@ -34,7 +39,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed
 
   return (
     <div className="max-w-md w-full text-center">
-      <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+      <h1 className={`text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r ${gradient}`}>
         {t('gameOver')}
       </h1>
       <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl mb-8 shadow-2xl">
@@ -80,7 +85,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed
 
       <button
         onClick={onRestart}
-        className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 transform transition-all hover:scale-105 shadow-lg"
+        className={`px-8 py-3 bg-gradient-to-r ${btnGradient} rounded-lg text-lg font-bold transform transition-all hover:scale-105 shadow-lg`}
       >
         {t('playAgain')}
       </button>

@@ -52,11 +52,12 @@ const shuffle = <T,>(arr: T[]): T[] => {
 const bags: Partial<Record<GameMode, string[]>> = {};
 
 // Tire un mot pour un mode donné, sans répétition tant que le pool n'est pas épuisé.
-export const getRandomWord = (mode: GameMode = 'classique') => {
-  let bag = bags[mode];
+// Accepte aussi les modes hardcore (chaos/sudden) -> pool commun.
+export const getRandomWord = (mode: string = 'classique') => {
+  let bag = bags[mode as GameMode];
   if (!bag || bag.length === 0) {
-    bag = shuffle([...COMMON_WORDS, ...(MODE_WORDS[mode] ?? [])]);
-    bags[mode] = bag;
+    bag = shuffle([...COMMON_WORDS, ...(MODE_WORDS[mode as GameMode] ?? [])]);
+    bags[mode as GameMode] = bag;
   }
   return bag.pop() as string;
 };

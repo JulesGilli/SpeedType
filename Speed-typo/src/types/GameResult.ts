@@ -1,10 +1,10 @@
 // src/types/GameResult.ts
-import { GameMode } from './GameMode';
+import { PlayMode } from './GameMode';
 
 // Résultat complet d'une partie — sert d'écran de résultat ET de payload pour
 // l'envoi des scores au leaderboard (Supabase).
 export interface GameResult {
-  mode: GameMode;
+  mode: PlayMode;
   score: number;
   wordCount: number;
   accuracy: number; // pourcentage 0-100
