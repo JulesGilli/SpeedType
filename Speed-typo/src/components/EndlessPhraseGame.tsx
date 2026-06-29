@@ -57,7 +57,9 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key.length !== 1) return; // ignore Shift, Alt, fleches, etc.
-            if (e.key === ' ') e.preventDefault(); // pas de scroll de page
+            // Empeche les raccourcis navigateur sur les touches qu'on gere :
+            // espace (scroll), et surtout ' et / (Quick Find de Firefox).
+            e.preventDefault();
             const expected = phrase[indexRef.current];
             if (e.key === expected) {
                 indexRef.current += 1;
