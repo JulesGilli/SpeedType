@@ -13,7 +13,7 @@ const BackgroundToggle: React.FC<BackgroundToggleProps> = ({ enabled, onToggle }
   <button
     onClick={() => onToggle(!enabled)}
     title={t('bgAnimated')}
-    className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold
+    className="fixed top-16 left-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold
       bg-gray-800/70 backdrop-blur-md border border-white/10 text-gray-200 hover:bg-gray-700/70 transition-colors"
   >
     <span>{t('bgAnimated')}</span>

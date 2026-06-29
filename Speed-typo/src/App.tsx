@@ -11,6 +11,8 @@ import Background from './components/Background';
 import BackgroundToggle from './components/BackgroundToggle';
 import LanguageSelector from './components/LanguageSelector';
 import HardcoreButton from './components/HardcoreButton';
+import AuthBar from './components/AuthBar';
+import AuthModal from './components/AuthModal';
 import { GameMode, PlayMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
@@ -41,6 +43,8 @@ function App() {
   const [hardcore, setHardcore] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [globalScore, setGlobalScore] = useState(0);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingStart, setPendingStart] = useState<PlayMode | null>(null);
   const [bgEnabled, setBgEnabled] = useState<boolean>(
     () => localStorage.getItem('st_bg_enabled') !== 'false'
   );
@@ -67,12 +71,34 @@ function App() {
     };
   }, [configured, user]);
 
-  // DEV: hardcore débloqué pour les tests. Remettre isHardcoreUnlocked(globalScore) pour la prod.
-  const hardcoreUnlocked = true || isHardcoreUnlocked(globalScore);
+  const hardcoreUnlocked = isHardcoreUnlocked(globalScore);
 
   const startGame = (mode: PlayMode) => {
     setPlayMode(mode);
     setGameState('playing');
+  };
+
+  // Avant de jouer : si le backend est dispo mais qu'on n'est pas connecté,
+  // on propose le popup de connexion (avec option "jouer sans compte").
+  const requestStart = (mode: PlayMode) => {
+    if (configured && !user) {
+      setPendingStart(mode);
+      setShowAuthModal(true);
+      return;
+    }
+    startGame(mode);
+  };
+
+  const closeAuthModal = () => {
+    setShowAuthModal(false);
+    setPendingStart(null);
+  };
+
+  const proceedAfterAuth = () => {
+    setShowAuthModal(false);
+    const m = pendingStart;
+    setPendingStart(null);
+    if (m) startGame(m);
   };
 
   const endGame = (gameResult: GameResult) => {
@@ -122,7 +148,7 @@ function App() {
               {gameState === 'start' && (
                 <motion.div key="start" className="w-full flex justify-center" {...screenAnim}>
                   <StartScreen
-                    onStart={() => startGame(selectedMode)}
+                    onStart={() => requestStart(selectedMode)}
                     selectedMode={selectedMode}
                     setSelectedMode={setSelectedMode}
                   />
@@ -131,7 +157,7 @@ function App() {
 
               {gameState === 'hardcore' && (
                 <motion.div key="hardcore" className="w-full flex justify-center" {...screenAnim}>
-                  <HardcoreScreen onPick={(m) => startGame(m)} onBack={exitHardcore} />
+                  <HardcoreScreen onPick={(m) => requestStart(m)} onBack={exitHardcore} />
                 </motion.div>
               )}
 
@@ -162,6 +188,9 @@ function App() {
             {/* Docks + contrôles : uniquement sur l'accueil classique */}
             {gameState === 'start' && (
               <>
+                <div className="fixed top-4 right-4 z-50">
+                  <AuthBar onRequestAuth={() => setShowAuthModal(true)} />
+                </div>
                 <LanguageSelector />
                 <BackgroundToggle enabled={bgEnabled} onToggle={toggleBackground} />
                 <HardcoreButton
@@ -178,6 +207,10 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showAuthModal && (
+        <AuthModal onClose={closeAuthModal} onSkip={proceedAfterAuth} onAuthed={proceedAfterAuth} />
+      )}
     </div>
   );
 }

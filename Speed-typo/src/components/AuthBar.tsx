@@ -11,7 +11,7 @@ const GoogleIcon = () => (
   </svg>
 );
 
-const AuthBar = () => {
+const AuthBar = ({ onRequestAuth }: { onRequestAuth?: () => void }) => {
   const { configured, loading, user, profile, signInWithGoogle, signOut } = useAuth();
   const { t } = useI18n();
 
@@ -19,14 +19,14 @@ const AuthBar = () => {
   if (!configured) return null;
 
   if (loading) {
-    return <div className="text-sm text-gray-500 mb-4 h-9 flex items-center justify-center">…</div>;
+    return <div className="text-sm text-gray-500 h-9 flex items-center justify-center">…</div>;
   }
 
   if (!user) {
     return (
-      <div className="mb-4 flex justify-center">
+      <div className="flex justify-center">
         <button
-          onClick={signInWithGoogle}
+          onClick={onRequestAuth ?? signInWithGoogle}
           className="group flex items-center gap-2.5 bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 hover:border-white/20 text-gray-100 font-medium pl-2 pr-4 py-2 rounded-xl shadow-lg transition-all"
         >
           <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-white shadow-sm">
@@ -39,7 +39,7 @@ const AuthBar = () => {
   }
 
   return (
-    <div className="mb-4 flex items-center justify-center gap-3">
+    <div className="flex items-center justify-center gap-3">
       <span className="text-sm text-gray-300">
         {t('connected')}{' '}
         <span className="text-purple-400 font-semibold">{profile?.username ?? user.email}</span>

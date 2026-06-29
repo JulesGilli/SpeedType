@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import GameModeSelector from './GameModeSelector';
-import AuthBar from './AuthBar';
 import Typewriter from './Typewriter';
 import { GameMode } from '../types/GameMode';
 import { useI18n } from '../lib/i18n';
@@ -22,14 +21,6 @@ const StartScreen: React.FC<StartScreenProps> = ({
 
   return (
     <div className="max-w-md w-full text-center">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.05 }}
-      >
-        <AuthBar />
-      </motion.div>
-
       <motion.h1
         className="text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600"
         initial={{ opacity: 0, y: -20, scale: 0.9 }}

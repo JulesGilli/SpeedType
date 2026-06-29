@@ -20,7 +20,7 @@ const HardcoreButton: React.FC<HardcoreButtonProps> = ({ unlocked, onClick }) =>
             : 'bg-gray-800/70 backdrop-blur-md border-white/10 text-gray-500 cursor-not-allowed'}
         `}
       >
-        {unlocked ? `🔥 ${t('hardcore')}` : `🔒 ${t('hardcore')}`}
+        {unlocked ? t('hardcore') : `🔒 ${t('hardcore')}`}
       </button>
       {!unlocked && (
         <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 px-3 py-2 rounded-lg bg-gray-900 border border-white/10 text-xs text-gray-300 text-center opacity-0 group-hover:opacity-100 transition-opacity shadow-xl">

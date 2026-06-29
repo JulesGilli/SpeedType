@@ -14,6 +14,12 @@ interface AuthContextValue {
   loading: boolean;
   configured: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<{ error: { message: string } | null }>;
+  signUpWithEmail: (
+    email: string,
+    password: string,
+    username: string
+  ) => Promise<{ error: { message: string } | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -74,6 +80,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const signInWithEmail = (email: string, password: string) =>
+    supabase.auth.signInWithPassword({ email, password });
+
+  // Inscription email/mot de passe ; le username part dans les métadonnées
+  // (le trigger st_handle_new_user crée le profil avec).
+  const signUpWithEmail = (email: string, password: string, username: string) =>
+    supabase.auth.signUp({ email, password, options: { data: { username } } });
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -87,6 +101,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         configured: isSupabaseConfigured,
         signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
         signOut,
       }}
     >
