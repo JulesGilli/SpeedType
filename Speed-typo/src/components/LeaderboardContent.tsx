@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import GameModeSelector from './GameModeSelector';
 import GlobalLeaderboard from './GlobalLeaderboard';
+import Segmented from './Segmented';
 import { GameMode } from '../types/GameMode';
 import { useAuth } from '../lib/AuthContext';
 import { useI18n } from '../lib/i18n';
@@ -27,11 +27,13 @@ const VIEWS: { key: View; tkey: string }[] = [
   { key: 'global', tkey: 'viewGlobal' },
 ];
 
+const MODES: GameMode[] = ['classique', 'inversé', 'leet', 'memoire', 'blind', 'endless'];
+
 // Contenu du classement (sélecteurs + tableau), sans chrome de page.
 // Réutilisé par le dock repliable de l'accueil.
 const LeaderboardContent: React.FC = () => {
   const { user, profile, configured } = useAuth();
-  const { t } = useI18n();
+  const { t, modeLabel } = useI18n();
   const [view, setView] = useState<View>('mode');
   const [period, setPeriod] = useState<LeaderboardPeriod>('month');
   const [mode, setMode] = useState<GameMode>('classique');
@@ -70,42 +72,21 @@ const LeaderboardContent: React.FC = () => {
 
   return (
     <div>
-      {/* Bascule Par mode / Global */}
-      <div className="flex justify-center gap-2 mb-3">
-        {VIEWS.map((v) => (
-          <button
-            key={v.key}
-            onClick={() => setView(v.key)}
-            className={`px-4 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200
-              ${view === v.key
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}
-            `}
-          >
-            {t(v.tkey)}
-          </button>
-        ))}
+      {/* Bascule Par mode / Global + période (sur la même ligne, compact) */}
+      <div className="flex items-center justify-center gap-2 mb-3 flex-wrap">
+        <Segmented
+          options={VIEWS.map((v) => ({ key: v.key, label: t(v.tkey) }))}
+          value={view}
+          onChange={setView}
+        />
+        {view === 'mode' && (
+          <Segmented
+            options={PERIODS.map((p) => ({ key: p.key, label: t(p.tkey) }))}
+            value={period}
+            onChange={setPeriod}
+          />
+        )}
       </div>
-
-      {/* Sélecteur de période (vue par mode uniquement) : le classement global
-          est mensuel par nature pour que les rangs se réinitialisent chaque mois. */}
-      {view === 'mode' && (
-        <div className="flex justify-center gap-2 mb-3 flex-wrap">
-          {PERIODS.map((p) => (
-            <button
-              key={p.key}
-              onClick={() => setPeriod(p.key)}
-              className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all duration-200
-                ${period === p.key
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}
-              `}
-            >
-              {t(p.tkey)}
-            </button>
-          ))}
-        </div>
-      )}
 
       {view === 'global' ? (
         <>
@@ -114,8 +95,22 @@ const LeaderboardContent: React.FC = () => {
         </>
       ) : (
       <>
-      {/* Sélecteur de mode */}
-      <GameModeSelector selectedMode={mode} onSelectMode={setMode} />
+      {/* Sélecteur de mode : pastilles compactes */}
+      <div className="flex flex-wrap justify-center gap-1.5 mb-1">
+        {MODES.map((m) => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200
+              ${mode === m
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow'
+                : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'}
+            `}
+          >
+            {modeLabel(m)}
+          </button>
+        ))}
+      </div>
 
       <div className="bg-gray-900/60 rounded-lg overflow-hidden mt-3">
         <div className="grid grid-cols-[2rem_1fr_4.5rem_3.5rem] gap-2 px-3 py-2 text-xs text-gray-400 border-b border-gray-700">
