@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { GameMode } from '../types/GameMode';
+import { PlayMode } from '../types/GameMode';
 
 export type LeaderboardPeriod = 'month' | 'all';
 
@@ -29,7 +29,7 @@ export interface MyGlobalRow extends GlobalRow {
 // Appelle la fonction SQL st_leaderboard(period, mode).
 export async function fetchLeaderboard(
   period: LeaderboardPeriod,
-  mode: GameMode
+  mode: PlayMode
 ): Promise<LeaderboardRow[]> {
   const { data, error } = await supabase.rpc('st_leaderboard', {
     p_period: period,
@@ -48,7 +48,7 @@ export async function fetchLeaderboard(
 // score sur cette période/ce mode, ou s'il n'est pas connecté.
 export async function fetchMyRank(
   period: LeaderboardPeriod,
-  mode: GameMode
+  mode: PlayMode
 ): Promise<MyRankRow | null> {
   const { data, error } = await supabase.rpc('st_my_rank', {
     p_period: period,

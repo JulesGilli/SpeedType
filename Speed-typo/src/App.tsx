@@ -14,6 +14,7 @@ import HardcoreButton from './components/HardcoreButton';
 import AuthBar from './components/AuthBar';
 import AuthModal from './components/AuthModal';
 import UsernameModal from './components/UsernameModal';
+import HardcoreLeaderboardDock from './components/HardcoreLeaderboardDock';
 import { GameMode, PlayMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
@@ -201,6 +202,10 @@ function App() {
                 <RankingDock />
               </>
             )}
+
+            {/* En hardcore : le classement par mode hardcore (DA rouge), à la
+                place du dock classique. */}
+            {gameState === 'hardcore' && <HardcoreLeaderboardDock />}
           </motion.div>
         )}
       </AnimatePresence>
