@@ -265,7 +265,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
       </div>
 
       <div className={`
-        bg-gray-800 p-6 rounded-lg shadow-lg relative overflow-hidden
+        bg-gray-800 p-6 rounded-lg shadow-lg relative overflow-hidden select-none
         transition-transform duration-50
         ${hardcore ? 'ring-1 ring-red-500/40' : ''}
         ${screenShake ? 'animate-shake' : ''}
@@ -322,6 +322,15 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
                 validateInput();
               }
             }}
+            // Anti-triche : pas de copier/coller/glisser-déposer dans le champ.
+            onPaste={(e) => e.preventDefault()}
+            onDrop={(e) => e.preventDefault()}
+            onCopy={(e) => e.preventDefault()}
+            onCut={(e) => e.preventDefault()}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
             className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 hover:bg-gray-600 ${hardcore ? 'focus:ring-red-500' : 'focus:ring-purple-500'} ${isBlind ? 'text-transparent caret-white' : 'text-white'
               }`}
           />
