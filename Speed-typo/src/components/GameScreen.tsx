@@ -321,6 +321,10 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
               if (e.key === 'Enter') {
                 validateInput();
               }
+              // Anti-triche : pas de "tout sélectionner" (révélerait le texte transparent).
+              if (isBlind && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+                e.preventDefault();
+              }
             }}
             // Anti-triche : pas de copier/coller/glisser-déposer dans le champ.
             onPaste={(e) => e.preventDefault()}
@@ -331,7 +335,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck={false}
-            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 hover:bg-gray-600 ${hardcore ? 'focus:ring-red-500' : 'focus:ring-purple-500'} ${isBlind ? 'text-transparent caret-white' : 'text-white'
+            className={`w-full bg-gray-700 text-center text-2xl py-4 px-6 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 hover:bg-gray-600 ${hardcore ? 'focus:ring-red-500' : 'focus:ring-purple-500'} ${isBlind ? 'blind-input text-transparent caret-white' : 'text-white'
               }`}
           />
 
