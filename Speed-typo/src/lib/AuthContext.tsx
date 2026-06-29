@@ -5,6 +5,7 @@ import { supabase, isSupabaseConfigured } from './supabase';
 interface Profile {
   id: string;
   username: string;
+  username_set: boolean;
 }
 
 interface AuthContextValue {
@@ -13,6 +14,9 @@ interface AuthContextValue {
   profile: Profile | null;
   loading: boolean;
   configured: boolean;
+  // True quand un user est connecté mais n'a pas encore choisi son pseudo
+  // (cas typique : 1re connexion Google → pseudo provisoire à confirmer).
+  needsUsername: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<{ error: { message: string } | null }>;
   signUpWithEmail: (
@@ -20,6 +24,7 @@ interface AuthContextValue {
     password: string,
     username: string
   ) => Promise<{ error: { message: string } | null }>;
+  updateUsername: (username: string) => Promise<{ error: { message: string } | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -49,6 +54,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const loadProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from('st_profiles')
+      .select('id, username, username_set')
+      .eq('id', userId)
+      .maybeSingle();
+    setProfile((data as Profile) ?? null);
+  };
+
   // Charge le pseudo public (st_profiles) à chaque changement d'utilisateur.
   useEffect(() => {
     const userId = session?.user?.id;
@@ -60,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     supabase
       .from('st_profiles')
-      .select('id, username')
+      .select('id, username, username_set')
       .eq('id', userId)
       .maybeSingle()
       .then(({ data }) => {
@@ -88,9 +102,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUpWithEmail = (email: string, password: string, username: string) =>
     supabase.auth.signUp({ email, password, options: { data: { username } } });
 
+  // Définit le pseudo choisi par l'utilisateur (marque le profil comme finalisé).
+  // Renvoie l'erreur 'taken' si le pseudo est déjà pris (contrainte d'unicité).
+  const updateUsername = async (username: string) => {
+    const userId = session?.user?.id;
+    if (!userId) return { error: { message: 'not-signed-in' } };
+
+    const { error } = await supabase
+      .from('st_profiles')
+      .update({ username: username.trim(), username_set: true })
+      .eq('id', userId);
+
+    if (error) {
+      return { error: { message: error.code === '23505' ? 'taken' : error.message } };
+    }
+    await loadProfile(userId);
+    return { error: null };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
+
+  const needsUsername =
+    isSupabaseConfigured && !!session?.user && !!profile && !profile.username_set;
 
   return (
     <AuthContext.Provider
@@ -100,9 +135,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         loading,
         configured: isSupabaseConfigured,
+        needsUsername,
         signInWithGoogle,
         signInWithEmail,
         signUpWithEmail,
+        updateUsername,
         signOut,
       }}
     >
