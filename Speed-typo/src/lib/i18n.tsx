@@ -71,6 +71,7 @@ const fr: Dict = {
   saveError: 'Échec de l’enregistrement du score',
   saveAnon: 'Connecte-toi pour apparaître au classement',
   endlessHint: 'Tape le texte qui défile. Va le plus loin possible avant la fin du temps.',
+  noApostrophe: 'Sans apostrophes',
   introEnter: 'pour entrer',
   introSkip: 'Entrée pour passer',
   introType: 'Tape',
@@ -143,6 +144,7 @@ const en: Dict = {
   saveError: 'Failed to save the score',
   saveAnon: 'Sign in to appear on the leaderboard',
   endlessHint: 'Type the scrolling text. Go as far as you can before time runs out.',
+  noApostrophe: 'No apostrophes',
   introEnter: 'to enter',
   introSkip: 'Enter to skip',
   introType: 'Type',
@@ -215,6 +217,7 @@ const es: Dict = {
   saveError: 'No se pudo guardar la puntuación',
   saveAnon: 'Inicia sesión para aparecer en la clasificación',
   endlessHint: 'Escribe el texto que se desplaza. Llega lo más lejos posible antes de que acabe el tiempo.',
+  noApostrophe: 'Sin apóstrofes',
   introEnter: 'para entrar',
   introSkip: 'Enter para saltar',
   introType: 'Escribe',
@@ -287,6 +290,7 @@ const de: Dict = {
   saveError: 'Speichern der Punktzahl fehlgeschlagen',
   saveAnon: 'Melde dich an, um in der Bestenliste zu erscheinen',
   endlessHint: 'Tippe den laufenden Text. Komm so weit wie möglich, bevor die Zeit abläuft.',
+  noApostrophe: 'Ohne Apostrophe',
   introEnter: 'zum Eintreten',
   introSkip: 'Enter zum Überspringen',
   introType: 'Tippe',
@@ -359,6 +363,7 @@ const it: Dict = {
   saveError: 'Salvataggio del punteggio non riuscito',
   saveAnon: 'Accedi per comparire in classifica',
   endlessHint: 'Scrivi il testo che scorre. Vai più lontano possibile prima che scada il tempo.',
+  noApostrophe: 'Senza apostrofi',
   introEnter: 'per entrare',
   introSkip: 'Invio per saltare',
   introType: 'Scrivi',
@@ -441,6 +446,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_2500_inversé: 'Cerveau inversé', accuracy_95_any: 'Précision', wpm_80_any: 'Surhumain',
     accuracy_100_any: 'Sans-faute', score_6000_classique: 'Légende', combo_15_any: 'Combo démentiel',
     score_3000_memoire: "Mémoire d'éléphant",
+    modes_2_any: 'Curieux', modes_3_any: 'Touche-à-tout', modes_4_any: 'Éclectique', modes_6_any: 'Maître polyvalent',
   },
   en: {
     games_3_any: 'Warm-up', wpm_35_any: 'Light touch', words_25_any: 'Chatterbox', score_1200_classique: 'First steps',
@@ -451,6 +457,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_2500_inversé: 'Reversed brain', accuracy_95_any: 'Precision', wpm_80_any: 'Superhuman',
     accuracy_100_any: 'Flawless', score_6000_classique: 'Legend', combo_15_any: 'Insane combo',
     score_3000_memoire: 'Elephant memory',
+    modes_2_any: 'Curious', modes_3_any: 'Jack of all trades', modes_4_any: 'Eclectic', modes_6_any: 'All-rounder master',
   },
   es: {
     games_3_any: 'Calentamiento', wpm_35_any: 'Toque ligero', words_25_any: 'Parlanchín', score_1200_classique: 'Primeros pasos',
@@ -461,6 +468,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_2500_inversé: 'Cerebro invertido', accuracy_95_any: 'Precisión', wpm_80_any: 'Sobrehumano',
     accuracy_100_any: 'Sin errores', score_6000_classique: 'Leyenda', combo_15_any: 'Combo demencial',
     score_3000_memoire: 'Memoria de elefante',
+    modes_2_any: 'Curioso', modes_3_any: 'Todoterreno', modes_4_any: 'Ecléctico', modes_6_any: 'Maestro polivalente',
   },
   de: {
     games_3_any: 'Aufwärmen', wpm_35_any: 'Leichter Anschlag', words_25_any: 'Plappermaul', score_1200_classique: 'Erste Schritte',
@@ -471,6 +479,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_2500_inversé: 'Umgekehrtes Hirn', accuracy_95_any: 'Präzision', wpm_80_any: 'Übermenschlich',
     accuracy_100_any: 'Fehlerfrei', score_6000_classique: 'Legende', combo_15_any: 'Wahnsinns-Combo',
     score_3000_memoire: 'Elefantengedächtnis',
+    modes_2_any: 'Neugierig', modes_3_any: 'Allrounder', modes_4_any: 'Vielseitig', modes_6_any: 'Alleskönner',
   },
   it: {
     games_3_any: 'Riscaldamento', wpm_35_any: 'Tocco leggero', words_25_any: 'Chiacchierone', score_1200_classique: 'Primi passi',
@@ -481,6 +490,7 @@ const CHALLENGE_TITLES: Record<Lang, Record<string, string>> = {
     score_2500_inversé: 'Cervello invertito', accuracy_95_any: 'Precisione', wpm_80_any: 'Sovrumano',
     accuracy_100_any: 'Senza errori', score_6000_classique: 'Leggenda', combo_15_any: 'Combo folle',
     score_3000_memoire: "Memoria d'elefante",
+    modes_2_any: 'Curioso', modes_3_any: 'Tuttofare', modes_4_any: 'Eclettico', modes_6_any: 'Maestro versatile',
   },
 };
 
@@ -492,7 +502,8 @@ const CHALLENGE_DESC: Record<Lang, Record<string, DescFn>> = {
     words: (v) => `Tape ${v} mots dans une partie`,
     score: (v, m) => `Marque ${v} points en ${m}`,
     combo: (v) => `Enchaîne un combo de ${v}`,
-    accuracy: (v) => `Termine une partie de 20+ mots à ${v}% de précision`,
+    accuracy: (v) => `Termine une partie de ${v >= 100 ? 40 : 30}+ mots à ${v}% de précision`,
+    modes: (v) => `Joue à ${v} modes de jeu différents`,
   },
   en: {
     games: (v) => `Finish ${v === 1 ? 'a game' : `${v} games`}`,
@@ -500,7 +511,8 @@ const CHALLENGE_DESC: Record<Lang, Record<string, DescFn>> = {
     words: (v) => `Type ${v} words in a game`,
     score: (v, m) => `Score ${v} points in ${m}`,
     combo: (v) => `Chain a combo of ${v}`,
-    accuracy: (v) => `Finish a 20+ word game at ${v}% accuracy`,
+    accuracy: (v) => `Finish a ${v >= 100 ? 40 : 30}+ word game at ${v}% accuracy`,
+    modes: (v) => `Play ${v} different game modes`,
   },
   es: {
     games: (v) => `Termina ${v === 1 ? 'una partida' : `${v} partidas`}`,
@@ -508,7 +520,8 @@ const CHALLENGE_DESC: Record<Lang, Record<string, DescFn>> = {
     words: (v) => `Escribe ${v} palabras en una partida`,
     score: (v, m) => `Marca ${v} puntos en ${m}`,
     combo: (v) => `Encadena un combo de ${v}`,
-    accuracy: (v) => `Termina una partida de 20+ palabras con ${v}% de precisión`,
+    accuracy: (v) => `Termina una partida de ${v >= 100 ? 40 : 30}+ palabras con ${v}% de precisión`,
+    modes: (v) => `Juega a ${v} modos de juego diferentes`,
   },
   de: {
     games: (v) => `Beende ${v === 1 ? 'ein Spiel' : `${v} Spiele`}`,
@@ -516,7 +529,8 @@ const CHALLENGE_DESC: Record<Lang, Record<string, DescFn>> = {
     words: (v) => `Tippe ${v} Wörter in einem Spiel`,
     score: (v, m) => `Erziele ${v} Punkte in ${m}`,
     combo: (v) => `Verkette ein Combo von ${v}`,
-    accuracy: (v) => `Beende ein Spiel mit 20+ Wörtern bei ${v}% Genauigkeit`,
+    accuracy: (v) => `Beende ein Spiel mit ${v >= 100 ? 40 : 30}+ Wörtern bei ${v}% Genauigkeit`,
+    modes: (v) => `Spiele ${v} verschiedene Spielmodi`,
   },
   it: {
     games: (v) => `Completa ${v === 1 ? 'una partita' : `${v} partite`}`,
@@ -524,11 +538,13 @@ const CHALLENGE_DESC: Record<Lang, Record<string, DescFn>> = {
     words: (v) => `Scrivi ${v} parole in una partita`,
     score: (v, m) => `Segna ${v} punti in ${m}`,
     combo: (v) => `Concatena un combo di ${v}`,
-    accuracy: (v) => `Completa una partita di 20+ parole al ${v}% di precisione`,
+    accuracy: (v) => `Completa una partita di ${v >= 100 ? 40 : 30}+ parole al ${v}% di precisione`,
+    modes: (v) => `Gioca a ${v} modalità di gioco diverse`,
   },
 };
 
 export interface ChallengeI18nInput {
+  title: string;       // titre français stocké en base (clé stable de traduction)
   goal_type: string;
   goal_value: number;
   mode: string | null;
@@ -646,10 +662,16 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const modeLabel = (m: GameMode) => MODE_LABELS[lang][m] ?? m;
   const modeDesc = (m: GameMode) => MODE_DESC[lang][m] ?? MODE_DESC.en[m] ?? [];
 
+  // Traduit un titre français (clé stable) vers la langue courante.
+  // Indépendant de la valeur cible : changer un goal_value ne casse rien.
+  const translateFrTitle = (frTitle: string) => {
+    const slug = FR_TITLE_TO_SLUG[frTitle];
+    if (!slug) return frTitle;
+    return CHALLENGE_TITLES[lang][slug] ?? frTitle;
+  };
+
   const challengeText = (c: ChallengeI18nInput) => {
-    const slug = `${c.goal_type}_${c.goal_value}_${c.mode ?? 'any'}`;
-    const title =
-      CHALLENGE_TITLES[lang][slug] ?? CHALLENGE_TITLES.en[slug] ?? slug;
+    const title = translateFrTitle(c.title);
     const descFn =
       (CHALLENGE_DESC[lang] ?? CHALLENGE_DESC.en)[c.goal_type] ??
       CHALLENGE_DESC.en[c.goal_type];
@@ -660,11 +682,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   };
 
   // Retraduit un titre de défi déjà stocké en français (liste des défis validés).
-  const challengeTitle = (frTitle: string) => {
-    const slug = FR_TITLE_TO_SLUG[frTitle];
-    if (!slug) return frTitle;
-    return CHALLENGE_TITLES[lang][slug] ?? frTitle;
-  };
+  const challengeTitle = (frTitle: string) => translateFrTitle(frTitle);
 
   return (
     <I18nContext.Provider

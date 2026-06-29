@@ -140,7 +140,9 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop
         setFallingWords(prev => prev.filter(w => w.id !== fid));
       }, 1500);
 
-      const wordScore = calculateScore(modifiedWord.length, timeTaken, newComboCount, wasLeet, wasReversed);
+      let wordScore = calculateScore(modifiedWord.length, timeTaken, newComboCount, wasLeet, wasReversed);
+      // Mode Leet : +10% de points (mode plus exigeant).
+      if (selectedMode === 'leet') wordScore = Math.round(wordScore * 1.1);
       setScore(prev => prev + wordScore);
       setLastScore(wordScore);
       setWordsCompleted(prev => prev + 1);

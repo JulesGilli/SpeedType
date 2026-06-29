@@ -22,12 +22,35 @@ const buildStream = (phrases: string[]): string => {
 
 const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop }) => {
     const { t, lang } = useI18n();
-    const phrase = useMemo(() => buildStream(ENDLESS_PHRASES[lang] ?? ENDLESS_PHRASES.en), [lang]);
+    // Option : retirer les apostrophes (certains claviers/navigateurs les gèrent mal).
+    const [noApostrophe, setNoApostrophe] = useState(
+        () => localStorage.getItem('st_endless_no_apos') === 'true'
+    );
+    const phrase = useMemo(() => {
+        const src = ENDLESS_PHRASES[lang] ?? ENDLESS_PHRASES.en;
+        const arr = noApostrophe ? src.map(p => p.replace(/['’]/g, '')) : src;
+        return buildStream(arr);
+    }, [lang, noApostrophe]);
     const [index, setIndex] = useState(0);
     const [errors, setErrors] = useState(0);
     const [wrong, setWrong] = useState(false);
     const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
     const indexRef = useRef(0);
+
+    // Rebuild du texte (langue ou option apostrophe) => on repart du début.
+    useEffect(() => {
+        indexRef.current = 0;
+        setIndex(0);
+        setErrors(0);
+    }, [phrase]);
+
+    const toggleApostrophe = () => {
+        setNoApostrophe(v => {
+            const next = !v;
+            localStorage.setItem('st_endless_no_apos', String(next));
+            return next;
+        });
+    };
     const wrongTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Frappe : on avance sur la bonne lettre, on signale l'erreur sinon.
@@ -65,7 +88,7 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
             const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
             onGameEnd({
                 mode: 'endless',
-                score: correct, // points = caractères corrects (≈ ancienne distance ×10)
+                score: correct * 10, // points = caractères corrects ×10
                 wordCount: Math.floor(correct / 5),
                 accuracy,
                 wpm: computeWpm(correct, GAME_DURATION),
@@ -91,7 +114,7 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
             {/* Bandeau haut */}
             <div className="flex justify-between items-center mb-6">
                 <div className="text-xl font-bold">
-                    {t('score')} : <span className="text-purple-400">{index}</span>
+                    {t('score')} : <span className="text-purple-400">{index * 10}</span>
                 </div>
                 <div className="text-xl font-bold">
                     {t('time')} :{' '}
@@ -163,7 +186,19 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
                 </div>
             </div>
 
-            <p className="text-center text-xs text-gray-500 mt-4">
+            <div className="flex justify-center mt-4">
+                <button
+                    onClick={toggleApostrophe}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800/70 border border-white/10 text-gray-200 hover:bg-gray-700/70 transition-colors"
+                >
+                    <span>{t('noApostrophe')}</span>
+                    <span className={`relative w-9 h-5 rounded-full transition-colors ${noApostrophe ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-gray-600'}`}>
+                        <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${noApostrophe ? 'left-[1.15rem]' : 'left-0.5'}`} />
+                    </span>
+                </button>
+            </div>
+
+            <p className="text-center text-xs text-gray-500 mt-3">
                 {t('endlessHint')}
             </p>
         </div>
