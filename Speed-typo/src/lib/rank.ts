@@ -13,7 +13,8 @@ export const TIERS: Tier[] = [
   { key: 'gold', min: 22000, color: '#facc15' },
   { key: 'diamond', min: 26000, color: '#a78bfa' },
   { key: 'master', min: 30000, color: '#f472b6' },
-  { key: 'grandmaster', min: 34000, color: '#ef4444' },
+  { key: 'grandmaster', min: 42000, color: '#ef4444' },
+  { key: 'divin', min: 50000, color: '#7dd3fc' },
 ];
 
 // Palier courant (le plus haut dont le seuil est atteint).
