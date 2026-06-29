@@ -90,3 +90,23 @@ export async function fetchMyGlobal(
   }
   return (data as MyGlobalRow[])?.[0] ?? null;
 }
+
+// Classement HARDCORE : cumul all-time des modes hardcore (chaos + sudden).
+export async function fetchHardcoreLeaderboard(): Promise<GlobalRow[]> {
+  const { data, error } = await supabase.rpc('st_hardcore_leaderboard');
+  if (error) {
+    console.error('[leaderboard] erreur classement hardcore:', error.message);
+    return [];
+  }
+  return (data as GlobalRow[]) ?? [];
+}
+
+// Rang hardcore du joueur connecté (même hors top). Null si non connecté/sans score.
+export async function fetchMyHardcore(): Promise<MyGlobalRow | null> {
+  const { data, error } = await supabase.rpc('st_my_hardcore');
+  if (error) {
+    console.error('[leaderboard] erreur rang hardcore:', error.message);
+    return null;
+  }
+  return (data as MyGlobalRow[])?.[0] ?? null;
+}

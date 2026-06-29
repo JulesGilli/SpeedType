@@ -80,16 +80,16 @@ function App() {
     setGameState('result');
     setClaimed([]);
 
-    // En Hardcore : pas d'envoi au classement (arène isolée pour l'instant).
-    if (hardcore || !configured || !user) {
-      setSaveStatus(hardcore ? 'idle' : 'anon');
+    if (!configured || !user) {
+      setSaveStatus('anon');
       return;
     }
 
     setSaveStatus('saving');
     submitScore(gameResult, user.id).then(({ error }) => {
       setSaveStatus(error ? 'error' : 'saved');
-      if (!error) {
+      // Les défis ne se valident que sur les modes normaux (pas en hardcore).
+      if (!error && !hardcore) {
         claimChallenges().then(setClaimed);
       }
     });
@@ -164,7 +164,13 @@ function App() {
               <>
                 <LanguageSelector />
                 <BackgroundToggle enabled={bgEnabled} onToggle={toggleBackground} />
-                <HardcoreButton unlocked={hardcoreUnlocked} onClick={() => setGameState('hardcore')} />
+                <HardcoreButton
+                  unlocked={hardcoreUnlocked}
+                  onClick={() => {
+                    setHardcore(true);
+                    setGameState('hardcore');
+                  }}
+                />
                 <LeaderboardDock />
                 <ChallengesDock />
               </>

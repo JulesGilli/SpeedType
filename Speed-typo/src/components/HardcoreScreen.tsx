@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { HardcoreMode } from '../types/GameMode';
 import { useI18n } from '../lib/i18n';
+import HardcoreLeaderboard from './HardcoreLeaderboard';
 
 interface HardcoreScreenProps {
   onPick: (mode: HardcoreMode) => void;
@@ -45,6 +46,15 @@ const HardcoreScreen: React.FC<HardcoreScreenProps> = ({ onPick, onBack }) => {
           </motion.button>
         ))}
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35, duration: 0.4 }}
+        className="mb-8"
+      >
+        <HardcoreLeaderboard />
+      </motion.div>
 
       <button
         onClick={onBack}
