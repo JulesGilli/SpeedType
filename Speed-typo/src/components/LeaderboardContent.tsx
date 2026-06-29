@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import GlobalLeaderboard from './GlobalLeaderboard';
 import Segmented from './Segmented';
 import { GameMode } from '../types/GameMode';
@@ -63,6 +64,12 @@ const LeaderboardContent: React.FC = () => {
     };
   }, [period, mode, configured, user, view]);
 
+  // On n'affiche l'état "Chargement" QUE s'il n'y a encore aucune donnée :
+  // lors d'un changement de mode, on garde les lignes (légèrement estompées)
+  // pour éviter que la carte se replie puis se redéploie brutalement.
+  const showLoader = loading && rows.length === 0;
+  const reloading = loading && rows.length > 0;
+
   const top = rows.slice(0, TOP_N);
   // Le joueur figure-t-il déjà dans le top affiché ? (on compare les ids,
   // robuste face aux ex æquo, plutôt que de comparer deux rangs calculés à part)
@@ -112,7 +119,11 @@ const LeaderboardContent: React.FC = () => {
         ))}
       </div>
 
-      <div className="bg-gray-900/60 rounded-lg overflow-hidden mt-3">
+      <motion.div
+        layout
+        transition={{ duration: 0.28, ease: 'easeOut' }}
+        className="bg-gray-900/60 rounded-lg overflow-hidden mt-3"
+      >
         <div className="grid grid-cols-[2rem_1fr_4.5rem_3.5rem] gap-2 px-3 py-2 text-xs text-gray-400 border-b border-gray-700">
           <div>#</div>
           <div>{t('colPlayer')}</div>
@@ -120,11 +131,12 @@ const LeaderboardContent: React.FC = () => {
           <div className="text-right">{t('wpm')}</div>
         </div>
 
+        <div className={reloading ? 'opacity-50 transition-opacity duration-200' : 'transition-opacity duration-200'}>
         {!configured ? (
           <div className="px-3 py-8 text-center text-gray-400 text-sm">
             {t('serverRequired')}
           </div>
-        ) : loading ? (
+        ) : showLoader ? (
           <div className="px-3 py-8 text-center text-gray-400 text-sm">{t('loading')}</div>
         ) : rows.length === 0 ? (
           <div className="px-3 py-8 text-center text-gray-400 text-sm">
@@ -163,11 +175,12 @@ const LeaderboardContent: React.FC = () => {
             );
           })
         )}
+        </div>
 
         {/* Ligne épinglée du joueur : rang réel s'il est hors top, sinon
             invitation à se classer / à se connecter. Masquée s'il est déjà
             visible dans le top ci-dessus. */}
-        {configured && !loading && !meInTop && (
+        {configured && !showLoader && !meInTop && (
           !user ? (
             <div className="px-3 py-2.5 text-center text-xs text-purple-300 bg-purple-500/10 border-t-2 border-gray-700">
               {t('saveAnon')}
@@ -199,7 +212,7 @@ const LeaderboardContent: React.FC = () => {
             </div>
           )
         )}
-      </div>
+      </motion.div>
       </>
       )}
     </div>
