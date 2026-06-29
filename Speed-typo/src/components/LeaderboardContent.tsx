@@ -66,8 +66,7 @@ const LeaderboardContent: React.FC = () => {
   // robuste face aux ex æquo, plutôt que de comparer deux rangs calculés à part)
   const meInTop = !!user && top.some((r) => r.user_id === user.id);
 
-  const formatScore = (value: number) =>
-    mode === 'endless' ? `${value} m` : `${value} pts`;
+  const formatScore = (value: number) => `${value} pts`;
 
   return (
     <div>

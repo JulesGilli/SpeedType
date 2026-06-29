@@ -65,7 +65,7 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
             const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
             onGameEnd({
                 mode: 'endless',
-                score: Math.round(correct / 10), // "distance" en mètres
+                score: correct, // points = caractères corrects (≈ ancienne distance ×10)
                 wordCount: Math.floor(correct / 5),
                 accuracy,
                 wpm: computeWpm(correct, GAME_DURATION),
@@ -80,7 +80,6 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
     const liveWpm = elapsed > 0 ? computeWpm(index, elapsed) : 0;
     const total = index + errors;
     const liveAccuracy = total > 0 ? Math.round((index / total) * 100) : 100;
-    const distance = (index / 10).toFixed(1);
     const wpmGauge = Math.min(100, (liveWpm / 130) * 100);
 
     // Fenêtre de texte affichée autour du curseur (perf + effet de défilement).
@@ -92,7 +91,7 @@ const EndlessPhraseGame: React.FC<EndlessPhraseGameProps> = ({ onGameEnd, onStop
             {/* Bandeau haut */}
             <div className="flex justify-between items-center mb-6">
                 <div className="text-xl font-bold">
-                    {t('distance')} : <span className="text-purple-400">{distance} m</span>
+                    {t('score')} : <span className="text-purple-400">{index}</span>
                 </div>
                 <div className="text-xl font-bold">
                     {t('time')} :{' '}
