@@ -10,6 +10,7 @@ import ChallengesDock from './components/ChallengesDock';
 import Background from './components/Background';
 import BackgroundToggle from './components/BackgroundToggle';
 import LanguageSelector from './components/LanguageSelector';
+import HardcoreButton from './components/HardcoreButton';
 import { GameMode, PlayMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
@@ -66,7 +67,8 @@ function App() {
     };
   }, [configured, user]);
 
-  const hardcoreUnlocked = isHardcoreUnlocked(globalScore);
+  // DEV: hardcore débloqué pour les tests. Remettre isHardcoreUnlocked(globalScore) pour la prod.
+  const hardcoreUnlocked = true || isHardcoreUnlocked(globalScore);
 
   const startGame = (mode: PlayMode) => {
     setPlayMode(mode);
@@ -123,8 +125,6 @@ function App() {
                     onStart={() => startGame(selectedMode)}
                     selectedMode={selectedMode}
                     setSelectedMode={setSelectedMode}
-                    onHardcore={() => setGameState('hardcore')}
-                    hardcoreUnlocked={hardcoreUnlocked}
                   />
                 </motion.div>
               )}
@@ -164,6 +164,7 @@ function App() {
               <>
                 <LanguageSelector />
                 <BackgroundToggle enabled={bgEnabled} onToggle={toggleBackground} />
+                <HardcoreButton unlocked={hardcoreUnlocked} onClick={() => setGameState('hardcore')} />
                 <LeaderboardDock />
                 <ChallengesDock />
               </>

@@ -10,16 +10,12 @@ interface StartScreenProps {
   onStart: () => void;
   selectedMode: GameMode;
   setSelectedMode: (mode: GameMode) => void;
-  onHardcore: () => void;
-  hardcoreUnlocked: boolean;
 }
 
 const StartScreen: React.FC<StartScreenProps> = ({
   onStart,
   selectedMode,
   setSelectedMode,
-  onHardcore,
-  hardcoreUnlocked,
 }) => {
   const { t, modeDesc } = useI18n();
   const lines = modeDesc(selectedMode);
@@ -71,36 +67,14 @@ const StartScreen: React.FC<StartScreenProps> = ({
           ))}
         </ul>
 
-        <div className="flex flex-col items-center gap-3">
-          <motion.button
-            onClick={onStart}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 shadow-lg"
-          >
-            {t('start')}
-          </motion.button>
-
-          {/* Mode Hardcore : grisé + tooltip tant que le rang Master n'est pas atteint */}
-          <div className="group relative">
-            <button
-              onClick={hardcoreUnlocked ? onHardcore : undefined}
-              disabled={!hardcoreUnlocked}
-              className={`px-6 py-2 rounded-lg text-sm font-bold border transition-all
-                ${hardcoreUnlocked
-                  ? 'bg-gradient-to-r from-red-600 to-orange-600 border-red-500/50 text-white hover:from-red-700 hover:to-orange-700 cursor-pointer'
-                  : 'bg-white/5 border-white/10 text-gray-500 cursor-not-allowed'}
-              `}
-            >
-              {hardcoreUnlocked ? `🔥 ${t('hardcore')}` : `🔒 ${t('hardcore')}`}
-            </button>
-            {!hardcoreUnlocked && (
-              <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 rounded-lg bg-gray-900 border border-white/10 text-xs text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity shadow-xl z-20">
-                {t('hardcoreLocked')}
-              </div>
-            )}
-          </div>
-        </div>
+        <motion.button
+          onClick={onStart}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-lg font-bold hover:from-purple-600 hover:to-pink-600 shadow-lg"
+        >
+          {t('start')}
+        </motion.button>
       </motion.div>
     </div>
   );
