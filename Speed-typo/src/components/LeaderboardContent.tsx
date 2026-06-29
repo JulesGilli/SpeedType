@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import GlobalLeaderboard from './GlobalLeaderboard';
 import Segmented from './Segmented';
+import RankInfo from './RankInfo';
 import { GameMode } from '../types/GameMode';
 import { useAuth } from '../lib/AuthContext';
 import { useI18n } from '../lib/i18n';
@@ -38,6 +39,7 @@ const LeaderboardContent: React.FC = () => {
   const [view, setView] = useState<View>('mode');
   const [period, setPeriod] = useState<LeaderboardPeriod>('month');
   const [mode, setMode] = useState<GameMode>('classique');
+  const [showRankInfo, setShowRankInfo] = useState(false);
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [myRank, setMyRank] = useState<MyRankRow | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,7 +95,21 @@ const LeaderboardContent: React.FC = () => {
             onChange={setPeriod}
           />
         )}
+        <button
+          onClick={() => setShowRankInfo((v) => !v)}
+          aria-label={t('rankInfoTitle')}
+          title={t('rankInfoTitle')}
+          className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-bold italic transition-colors
+            ${showRankInfo
+              ? 'border-purple-400 text-purple-300 bg-purple-500/15'
+              : 'border-white/15 text-gray-300 hover:text-white hover:border-white/40'}
+          `}
+        >
+          i
+        </button>
       </div>
+
+      {showRankInfo && <RankInfo />}
 
       {view === 'global' ? (
         <>
