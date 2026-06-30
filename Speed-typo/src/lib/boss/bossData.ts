@@ -127,13 +127,22 @@ export const INCANTATION_WORDS = [
 export const randomIncantation = () =>
   INCANTATION_WORDS[Math.floor(Math.random() * INCANTATION_WORDS.length)];
 
-// Mots cosmétiques affichés sur les projectiles du boss (le joueur ne les tape pas).
+// Mots affichés sur les projectiles du boss : le joueur peut les TAPER pour
+// détruire l'attaque individuellement. Aucun ne doit coïncider avec un mot de
+// carte (sinon ambiguïté) — d'où l'absence de 'rage'/'doom' ici.
 export const BOSS_ATTACK_WORDS = [
-  'crash', 'virus', 'lag', 'glitch', 'ban', 'rage', 'spam', 'bug', 'wipe', 'doom',
-  'null', 'panic', 'freeze', 'hack', 'curse',
+  'crash', 'virus', 'lag', 'glitch', 'hex', 'spam', 'bug', 'wipe', 'void', 'panic',
+  'freeze', 'hack', 'curse', 'dread', 'venom', 'sludge', 'toxic', 'decay', 'plague', 'sting',
 ];
 export const randomBossWord = () =>
   BOSS_ATTACK_WORDS[Math.floor(Math.random() * BOSS_ATTACK_WORDS.length)];
+
+// Tire un mot d'attaque en évitant ceux déjà en jeu (frappe individuelle non ambiguë).
+export const pickBossWord = (exclude: Set<string>) => {
+  const avail = BOSS_ATTACK_WORDS.filter((w) => !exclude.has(w));
+  const pool = avail.length ? avail : BOSS_ATTACK_WORDS;
+  return pool[Math.floor(Math.random() * pool.length)];
+};
 
 // --- Économie : boosters ---
 export const BOOSTER_COST = 120;

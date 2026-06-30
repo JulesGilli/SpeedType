@@ -8,7 +8,7 @@ import {
   CardDef,
   cardDamage,
   cardHeal,
-  randomBossWord,
+  pickBossWord,
   randomIncantation,
 } from '../../lib/boss/bossData';
 
@@ -171,12 +171,17 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
 
         // Salve : on lance plusieurs mots rapprochés (suspendu pendant une incantation).
         if (!channeling && t0 >= nextVolleyRef.current) {
+          // Mots déjà en jeu : on évite les doublons pour que taper un nom vise sans ambiguïté.
+          const used = new Set<string>();
+          for (const p of projsRef.current) if (p.kind === 'boss' && !p.dead) used.add(p.word);
           for (let i = 0; i < phase.salvoSize; i++) {
             const armored = Math.random() < phase.shieldedChance;
+            const word = pickBossWord(used);
+            used.add(word);
             projsRef.current.push({
               id: nextId(),
               kind: 'boss',
-              word: randomBossWord(),
+              word,
               born: t0 + i * phase.salvoGapMs,
               ttl: phase.travelMs,
               dmg: phase.damage,
@@ -343,6 +348,27 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
       return;
     }
 
+    // Détruire une attaque ennemie en tapant son nom (1 fois suffit, même blindée).
+    // On vise le projectile lancé le plus proche du joueur ; à défaut un en attente.
+    const t1 = now();
+    let target: Projectile | null = null;
+    let bestProg = -Infinity;
+    for (const p of projsRef.current) {
+      if (p.kind !== 'boss' || p.dead || p.word.toLowerCase() !== ci) continue;
+      const prog = p.born > t1 ? -1 : (t1 - p.born) / p.ttl;
+      if (prog > bestProg) {
+        bestProg = prog;
+        target = p;
+      }
+    }
+    if (target) {
+      target.dead = true;
+      wordsRef.current += 1;
+      pushFx({ type: 'break', top: bossProjTop(target, t1), left: 50 + target.lane * 30, color: '#fbbf24' });
+      setInput('');
+      return;
+    }
+
     // Correspondance exacte avec une carte équipée → activation.
     const exact = deck.find((e) => e.card.word.toLowerCase() === ci);
     if (exact) {
@@ -350,9 +376,12 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
       setInput('');
       return;
     }
-    // Aucune cible (carte ou incantation) ne commence par ce qui est tapé → faute.
+    // Aucune cible (carte, incantation ou attaque ennemie) ne commence par ce qui est tapé → faute.
     const incPrefix = !!inc && inc.word.toLowerCase().startsWith(ci);
-    const anyPrefix = incPrefix || deck.some((e) => e.card.word.toLowerCase().startsWith(ci));
+    const bossPrefix = projsRef.current.some(
+      (p) => p.kind === 'boss' && !p.dead && p.word.toLowerCase().startsWith(ci)
+    );
+    const anyPrefix = incPrefix || bossPrefix || deck.some((e) => e.card.word.toLowerCase().startsWith(ci));
     if (!anyPrefix) {
       setInput('');
       triggerShake();
