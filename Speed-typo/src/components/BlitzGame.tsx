@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import WordDisplay from './WordDisplay';
-import { getRandomWord, calculateScore, computeWpm } from '../utils/gameUtils';
+import { getRandomWord, getShortWord, calculateScore, computeWpm } from '../utils/gameUtils';
 import { GameResult } from '../types/GameResult';
 import { useI18n } from '../lib/i18n';
 
@@ -46,7 +46,8 @@ const BlitzGame: React.FC<BlitzGameProps> = ({ onGameEnd, onStop }) => {
 
   const newWord = () => {
     setMain(getRandomWord('blitz'));
-    setBonus(Math.random() < BONUS_CHANCE ? getRandomWord('blitz') : null);
+    // Mot bonus = mot court (≤6 lettres), rapide à choper avant le mot principal.
+    setBonus(Math.random() < BONUS_CHANCE ? getShortWord() : null);
     setBonusGrabbed(false);
     setInput('');
     wordStartRef.current = Date.now();

@@ -61,6 +61,20 @@ export const getRandomWord = (mode: string = 'classique') => {
   }
   return bag.pop() as string;
 };
+
+// Mots courts (≤ 6 lettres) pour les bonus du mode Blitz : doivent rester rapides à taper.
+const SHORT_WORDS = [
+  'rizz', 'sus', 'npc', 'yeet', 'based', 'drip', 'goat', 'aura', 'sigma', 'noob',
+  'epic', 'mid', 'cap', 'combo', 'turbo', 'laser', 'pixel', 'ninja', 'cobra', 'jade',
+  'onyx', 'echo', 'metal', 'vibe', 'slay', 'flex', 'grind', 'meme', 'boss', 'loot',
+  'spawn', 'frag', 'clutch', 'gyatt', 'sheesh', 'chad', 'op', 'gg', 'ez', 'lag',
+  'buff', 'nerf', 'tank', 'heal', 'crit', 'ping', 'spam', 'troll', 'quest', 'mage',
+  'rogue', 'glow', 'cope', 'mald', 'huzz', 'fanum', 'gworm',
+];
+
+// Tire un mot court au hasard (bonus Blitz).
+export const getShortWord = () => SHORT_WORDS[Math.floor(Math.random() * SHORT_WORDS.length)];
+
 // Replace letters with numbers or reverse the word
 export const modifyWord = (
   word: string,
