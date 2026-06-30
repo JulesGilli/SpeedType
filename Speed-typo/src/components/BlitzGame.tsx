@@ -11,7 +11,7 @@ interface BlitzGameProps {
 
 const START_BUDGET = 5000; // ms pour le 1er mot
 const MIN_BUDGET = 800; // plancher
-const DECAY = 0.9; // -10% par mot
+const DECAY = 0.95; // -5% par mot
 const BONUS_CHANCE = 0.6;
 const BONUS_PER_CHAR = 15;
 
