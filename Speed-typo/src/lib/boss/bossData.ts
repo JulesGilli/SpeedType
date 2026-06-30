@@ -120,6 +120,9 @@ export const BOSS_PHASES: BossPhase[] = [
 export const WIN_BONUS_GOLD = 200;
 export const PLAYER_MAX_HP = 100;
 
+// Or gagné par point de dégât infligé à une phase non terminée (consolation en cas de défaite).
+export const GOLD_PER_DAMAGE = 0.5;
+
 // Incantations à taper pour contrer le coup fatal (distinctes des mots de cartes).
 export const INCANTATION_WORDS = [
   'extinction', 'cataclysme', 'supernova', 'anathema', 'oblivion', 'apocalypse', 'maelstrom',

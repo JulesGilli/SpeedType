@@ -4,6 +4,7 @@ import {
   BOSS_PHASES,
   PLAYER_MAX_HP,
   WIN_BONUS_GOLD,
+  GOLD_PER_DAMAGE,
   RARITY_COLOR,
   CardDef,
   cardDamage,
@@ -114,6 +115,13 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
       if (endedRef.current) return;
       endedRef.current = true;
       statusRef.current = win ? 'won' : 'lost';
+      // Défaite : on récompense quand même les dégâts infligés à la phase en cours
+      // (les phases franchies ont déjà donné leur or). Évite de repartir les mains vides.
+      if (!win) {
+        const ph = BOSS_PHASES[phaseIdxRef.current];
+        const partial = Math.max(0, ph.maxHp - bossHpRef.current);
+        goldRef.current += Math.round(partial * GOLD_PER_DAMAGE);
+      }
       const elapsed = Math.max(1, (now() - startRef.current) / 1000);
       window.setTimeout(() => {
         onEnd({

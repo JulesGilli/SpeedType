@@ -21,6 +21,7 @@ const PERIODS: { key: LeaderboardPeriod; tkey: string }[] = [
 const MODES: { mode: HardcoreMode; tkey: string }[] = [
   { mode: 'chaos', tkey: 'chaosTitle' },
   { mode: 'sudden', tkey: 'suddenTitle' },
+  { mode: 'blitz', tkey: 'blitzTitle' },
 ];
 
 const GRID = 'grid grid-cols-[2rem_1fr_4.5rem_3.5rem] gap-2 px-3 py-2 items-center';
