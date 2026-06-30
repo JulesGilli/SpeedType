@@ -7,6 +7,7 @@ import { PlayMode } from '../types/GameMode';
 import { GameResult } from '../types/GameResult';
 import { useI18n } from '../lib/i18n';
 import EndlessPhraseGame from './EndlessPhraseGame';
+import BlitzGame from './BlitzGame';
 
 const GAME_DURATION = 60;
 
@@ -20,6 +21,9 @@ interface GameScreenProps {
 const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd, selectedMode, onStop, hardcore = false }) => {
   if (selectedMode === 'endless') {
     return <EndlessPhraseGame onGameEnd={onGameEnd} onStop={onStop} />;
+  }
+  if (selectedMode === 'blitz') {
+    return <BlitzGame onGameEnd={onGameEnd} onStop={onStop} />;
   }
 
   const { t } = useI18n();

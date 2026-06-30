@@ -13,6 +13,7 @@ import LanguageSelector from './components/LanguageSelector';
 import HardcoreButton from './components/HardcoreButton';
 import AuthBar from './components/AuthBar';
 import AuthModal from './components/AuthModal';
+import ChampionBanner from './components/ChampionBanner';
 import { GameMode, PlayMode } from './types/GameMode';
 import { GameResult } from './types/GameResult';
 import { useAuth } from './lib/AuthContext';
@@ -140,6 +141,8 @@ function App() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           >
+            <ChampionBanner />
+
             <AnimatePresence mode="wait">
               {gameState === 'start' && (
                 <motion.div key="start" className="w-full flex justify-center" {...screenAnim}>

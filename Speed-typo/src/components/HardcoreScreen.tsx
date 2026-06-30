@@ -14,6 +14,7 @@ const HardcoreScreen: React.FC<HardcoreScreenProps> = ({ onPick, onBack }) => {
   const cards: { mode: HardcoreMode; title: string; desc: string }[] = [
     { mode: 'chaos', title: t('chaosTitle'), desc: t('chaosDesc') },
     { mode: 'sudden', title: t('suddenTitle'), desc: t('suddenDesc') },
+    { mode: 'blitz', title: t('blitzTitle'), desc: t('blitzDesc') },
   ];
 
   return (
