@@ -38,15 +38,19 @@ const AuthBar = ({ onRequestAuth }: { onRequestAuth?: () => void }) => {
     );
   }
 
+  // Affiche le pseudo (sans le domaine si c'est un email), tronqué.
+  const rawName = profile?.username ?? user.email ?? '';
+  const displayName = rawName.includes('@') ? rawName.split('@')[0] : rawName;
+
   return (
-    <div className="flex items-center justify-center gap-2 max-w-[60vw] sm:max-w-none">
-      <span className="text-sm text-gray-300 truncate">
+    <div className="flex items-center justify-end gap-2 max-w-[70vw] sm:max-w-[16rem] bg-gray-800/70 backdrop-blur-md border border-white/10 rounded-xl pl-3 pr-2 py-1.5">
+      <span className="text-sm text-gray-300 truncate min-w-0">
         <span className="hidden sm:inline">{t('connected')} </span>
-        <span className="text-purple-400 font-semibold">{profile?.username ?? user.email}</span>
+        <span className="text-purple-400 font-semibold">{displayName}</span>
       </span>
       <button
         onClick={signOut}
-        className="text-xs px-3 py-1 rounded bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
+        className="shrink-0 text-xs px-2.5 py-1 rounded-lg bg-gray-700 text-gray-200 hover:bg-gray-600 transition-colors"
       >
         {t('logout')}
       </button>
