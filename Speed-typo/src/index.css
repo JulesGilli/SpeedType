@@ -82,6 +82,17 @@ body {
   background-color: #0f0f17;
 }
 
+/* Anti-triche : en mode blind/chaos le texte est transparent, mais une sélection
+   (Ctrl+A ou souris) le révélerait via le surlignage. On neutralise la sélection. */
+.blind-input::selection {
+  background: transparent;
+  color: transparent;
+}
+.blind-input::-moz-selection {
+  background: transparent;
+  color: transparent;
+}
+
 /* Scrollbars dans la DA (docks classement / défis). */
 .nice-scroll {
   scrollbar-width: thin;
