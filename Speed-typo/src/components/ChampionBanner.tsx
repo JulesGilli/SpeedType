@@ -59,8 +59,8 @@ const ChampionBanner: React.FC = () => {
   };
 
   return (
-    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-40 w-[min(92vw,640px)]">
-      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900/85 backdrop-blur-md border border-yellow-500/30 shadow-lg">
+    <div className="fixed z-30 top-0 inset-x-0 sm:top-3 sm:left-1/2 sm:-translate-x-1/2 sm:inset-x-auto sm:w-[min(92vw,640px)]">
+      <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/85 backdrop-blur-md border border-yellow-500/30 shadow-lg rounded-b-xl sm:rounded-full">
         <span className="text-[10px] font-bold text-yellow-400 tracking-widest shrink-0">N°1</span>
 
         {editing ? (

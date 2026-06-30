@@ -10,7 +10,7 @@ const HardcoreButton: React.FC<HardcoreButtonProps> = ({ unlocked, onClick }) =>
   const { t } = useI18n();
 
   return (
-    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 group">
+    <div className="fixed bottom-16 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 group">
       <button
         onClick={unlocked ? onClick : undefined}
         disabled={!unlocked}
