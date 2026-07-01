@@ -13,7 +13,8 @@ import {
   MAX_DECK,
   BOOSTER_COST,
   TOTAL_PHASES,
-  upgradeCost,
+  UPGRADE_COST,
+  upgradesForLevel,
   cardDamage,
   cardHeal,
   CardDef,
@@ -161,7 +162,7 @@ const BossLobby: React.FC<BossLobbyProps> = ({ progress, setProgress, onFight, o
           const o = owned[id];
           const color = RARITY_COLOR[c.rarity];
           const equipped = progress.deck.includes(id);
-          const cost = upgradeCost(o.level);
+          const needed = upgradesForLevel(o.level); // améliorations pour le niveau suivant
           return (
             <div key={id} className="rounded-lg p-2.5 bg-gray-800/80 ring-1" style={{ ['--tw-ring-color' as string]: `${color}55` }}>
               <div className="flex items-center justify-between">
@@ -169,6 +170,13 @@ const BossLobby: React.FC<BossLobbyProps> = ({ progress, setProgress, onFight, o
                 <span className="text-[10px] uppercase tracking-wider" style={{ color }}>{t(`bossRarity_${c.rarity}`)}</span>
               </div>
               <div className="text-xs text-gray-400 mt-0.5">{statLabel(c, o.level)} · Lv{o.level} · {(c.cooldownMs / 1000).toFixed(1)}s</div>
+              {/* Progression vers le niveau suivant (améliorations achetées + doublons) */}
+              <div className="mt-1.5 flex items-center gap-1" title={`${o.progress}/${needed} ${t('bossUpgrades')}`}>
+                {Array.from({ length: needed }).map((_, i) => (
+                  <div key={i} className="h-1 flex-1 rounded-full" style={{ background: i < o.progress ? '#fbbf24' : 'rgba(255,255,255,0.12)' }} />
+                ))}
+                <span className="text-[10px] text-yellow-300/80 ml-1">{o.progress}/{needed}</span>
+              </div>
               <div className="flex gap-1.5 mt-2">
                 <button onClick={() => setProgress(toggleEquip(progress, id))}
                   disabled={!equipped && progress.deck.length >= MAX_DECK}
@@ -177,7 +185,7 @@ const BossLobby: React.FC<BossLobbyProps> = ({ progress, setProgress, onFight, o
                 </button>
                 <button onClick={() => handleUpgrade(id)}
                   className="flex-1 text-xs py-1 rounded bg-yellow-500/15 text-yellow-300 hover:bg-yellow-500/25">
-                  ⬆ {cost}🪙
+                  ⬆ {UPGRADE_COST}🪙
                 </button>
               </div>
             </div>

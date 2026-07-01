@@ -8,7 +8,8 @@ import {
   MAX_DECK,
   CARD_BY_ID,
   rollBoosterCard,
-  upgradeCost,
+  UPGRADE_COST,
+  upgradesForLevel,
   BOOSTER_COST,
   CardDef,
 } from './bossData';
@@ -18,8 +19,20 @@ const START_GOLD = 150;
 
 export interface OwnedCard {
   level: number;
-  count: number; // exemplaires (les doublons servent à monter de niveau)
+  progress: number; // améliorations accumulées vers le niveau suivant
 }
+
+// Applique une amélioration (achat OU doublon) : +1 progression, et monte de
+// niveau quand on atteint le nombre requis (= niveau courant).
+const applyUpgrade = (o: OwnedCard): OwnedCard => {
+  let level = o.level;
+  let progress = o.progress + 1;
+  if (progress >= upgradesForLevel(level)) {
+    progress -= upgradesForLevel(level);
+    level += 1;
+  }
+  return { level, progress };
+};
 
 export interface BossProgress {
   gold: number;
@@ -30,7 +43,7 @@ export interface BossProgress {
 
 const defaultProgress = (): BossProgress => {
   const owned: Record<string, OwnedCard> = {};
-  for (const id of STARTER_DECK) owned[id] = { level: 1, count: 1 };
+  for (const id of STARTER_DECK) owned[id] = { level: 1, progress: 0 };
   return { gold: START_GOLD, owned, deck: [...STARTER_DECK], bestPhase: 0 };
 };
 
@@ -42,7 +55,7 @@ export const loadProgress = (): BossProgress => {
     // Garde-fous : on filtre les ids inconnus (catalogue qui a pu changer).
     const owned: Record<string, OwnedCard> = {};
     for (const [id, v] of Object.entries(p.owned ?? {})) {
-      if (CARD_BY_ID[id]) owned[id] = { level: Math.max(1, v.level | 0), count: Math.max(1, v.count | 0) };
+      if (CARD_BY_ID[id]) owned[id] = { level: Math.max(1, v.level | 0), progress: Math.max(0, v.progress | 0) };
     }
     if (Object.keys(owned).length === 0) return defaultProgress();
     const deck = (p.deck ?? []).filter((id) => owned[id]).slice(0, MAX_DECK);
@@ -85,17 +98,16 @@ export const toggleEquip = (p: BossProgress, id: string): BossProgress => {
   return { ...p, deck: [...p.deck, id] };
 };
 
-// Améliore une carte (consomme de l'or). Renvoie {progress, ok}.
+// Achète une amélioration (coût fixe). +1 progression, montée de niveau auto.
 export const upgrade = (p: BossProgress, id: string): { progress: BossProgress; ok: boolean } => {
   const o = p.owned[id];
   if (!o) return { progress: p, ok: false };
-  const cost = upgradeCost(o.level);
-  if (p.gold < cost) return { progress: p, ok: false };
+  if (p.gold < UPGRADE_COST) return { progress: p, ok: false };
   return {
     progress: {
       ...p,
-      gold: p.gold - cost,
-      owned: { ...p.owned, [id]: { ...o, level: o.level + 1 } },
+      gold: p.gold - UPGRADE_COST,
+      owned: { ...p.owned, [id]: applyUpgrade(o) },
     },
     ok: true,
   };
@@ -110,9 +122,8 @@ export const openBooster = (
   const existing = p.owned[card.id];
   const isNew = !existing;
   const owned = { ...p.owned };
-  owned[card.id] = existing
-    ? { ...existing, count: existing.count + 1 }
-    : { level: 1, count: 1 };
+  // Doublon = une amélioration gratuite ; nouvelle carte = niveau 1.
+  owned[card.id] = existing ? applyUpgrade(existing) : { level: 1, progress: 0 };
   let deck = p.deck;
   // Carte inédite : on l'équipe automatiquement s'il reste de la place.
   if (isNew && deck.length < MAX_DECK) deck = [...deck, card.id];

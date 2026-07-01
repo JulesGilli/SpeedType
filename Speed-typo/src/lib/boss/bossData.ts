@@ -174,8 +174,13 @@ export const pickBossWord = (exclude: Set<string>) => {
 
 // --- Économie : boosters ---
 export const BOOSTER_COST = 120;
-// Coût d'amélioration d'une carte (croît avec le niveau).
-export const upgradeCost = (level: number) => 50 * level;
+
+// Amélioration des cartes : chaque amélioration coûte un montant FIXE, mais
+// passer un niveau demande de plus en plus d'améliorations.
+// niveau 1→2 : 1 amélioration, 2→3 : 2, 3→4 : 3, etc. (= niveau courant).
+// Un doublon tiré dans un booster vaut une amélioration gratuite.
+export const UPGRADE_COST = 50; // coût d'une amélioration (unitaire)
+export const upgradesForLevel = (level: number) => level; // améliorations pour atteindre le niveau suivant
 
 // Probabilités de tirage d'un booster, par rareté.
 const BOOSTER_WEIGHTS: { rarity: Rarity; weight: number }[] = [
