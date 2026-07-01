@@ -12,6 +12,7 @@ import {
   RARITY_COLOR,
   MAX_DECK,
   BOOSTER_COST,
+  TOTAL_PHASES,
   upgradeCost,
   cardDamage,
   cardHeal,
@@ -68,7 +69,7 @@ const BossLobby: React.FC<BossLobbyProps> = ({ progress, setProgress, onFight, o
   return (
     <div className="max-w-3xl w-full">
       {/* En-tête : titre + or */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
           {t('bossTitle')}
         </h1>
@@ -76,6 +77,18 @@ const BossLobby: React.FC<BossLobbyProps> = ({ progress, setProgress, onFight, o
           <span className="text-yellow-400 text-lg">🪙</span>
           <span className="font-bold text-yellow-300">{progress.gold}</span>
         </div>
+      </div>
+
+      {/* Meilleure progression (boss-rush 10 phases) */}
+      <div className="mb-4 flex items-center gap-3">
+        <span className="text-xs text-gray-400 whitespace-nowrap">{t('bossBestProgress')}</span>
+        <div className="flex-1 flex gap-1">
+          {Array.from({ length: TOTAL_PHASES }).map((_, i) => (
+            <div key={i} className="flex-1 h-1.5 rounded-full"
+              style={{ background: i < progress.bestPhase ? '#f59e0b' : 'rgba(255,255,255,0.1)' }} />
+          ))}
+        </div>
+        <span className="text-xs font-bold text-orange-300 whitespace-nowrap">{progress.bestPhase}/{TOTAL_PHASES}</span>
       </div>
 
       {flash && <div className="mb-3 text-center text-sm text-red-300">{flash}</div>}

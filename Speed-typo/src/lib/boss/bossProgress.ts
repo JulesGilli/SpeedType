@@ -25,12 +25,13 @@ export interface BossProgress {
   gold: number;
   owned: Record<string, OwnedCard>;
   deck: string[]; // ids équipés (ordre = ordre d'affichage)
+  bestPhase: number; // meilleure phase atteinte (0 = jamais joué)
 }
 
 const defaultProgress = (): BossProgress => {
   const owned: Record<string, OwnedCard> = {};
   for (const id of STARTER_DECK) owned[id] = { level: 1, count: 1 };
-  return { gold: START_GOLD, owned, deck: [...STARTER_DECK] };
+  return { gold: START_GOLD, owned, deck: [...STARTER_DECK], bestPhase: 0 };
 };
 
 export const loadProgress = (): BossProgress => {
@@ -49,11 +50,16 @@ export const loadProgress = (): BossProgress => {
       gold: Math.max(0, p.gold | 0),
       owned,
       deck: deck.length ? deck : Object.keys(owned).slice(0, MAX_DECK),
+      bestPhase: Math.max(0, p.bestPhase | 0),
     };
   } catch {
     return defaultProgress();
   }
 };
+
+// Met à jour la meilleure phase atteinte (ne redescend jamais).
+export const recordBestPhase = (p: BossProgress, reached: number): BossProgress =>
+  reached > p.bestPhase ? { ...p, bestPhase: reached } : p;
 
 export const saveProgress = (p: BossProgress) => {
   try {

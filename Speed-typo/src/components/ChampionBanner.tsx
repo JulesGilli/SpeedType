@@ -11,7 +11,7 @@ const PencilIcon = () => (
   </svg>
 );
 
-// Bannière du champion : message du #1 all-time, visible par tous en haut de page.
+// Bannière du champion : message du #1 mensuel, visible par tous en haut de page.
 const ChampionBanner: React.FC = () => {
   const { user, configured } = useAuth();
   const { t } = useI18n();
@@ -29,7 +29,7 @@ const ChampionBanner: React.FC = () => {
     if (!configured) return;
     load();
     if (user) {
-      fetchMyGlobal('all').then((r) => setIsChampion(r?.rank === 1));
+      fetchMyGlobal('month').then((r) => setIsChampion(r?.rank === 1));
     } else {
       setIsChampion(false);
     }

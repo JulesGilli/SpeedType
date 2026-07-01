@@ -19,7 +19,7 @@ export async function fetchChampion(): Promise<Champion | null> {
   return (data as Champion) ?? null;
 }
 
-// Réservé au #1 all-time (vérifié côté serveur ; lève une erreur sinon).
+// Réservé au #1 mensuel (vérifié côté serveur ; lève une erreur sinon).
 export async function setChampionMessage(message: string): Promise<{ error: { message: string } | null }> {
   const { error } = await supabase.rpc('st_set_champion_message', { p_message: message });
   return { error };

@@ -17,6 +17,7 @@ export interface BossOutcome {
   win: boolean;
   goldEarned: number;
   phasesCleared: number;
+  reachedPhase: number; // phase la plus avancée atteinte (1-based, même si non terminée)
   totalPhases: number;
   damageDealt: number;
   wordsTyped: number;
@@ -81,6 +82,8 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
   const nextVolleyRef = useRef(0);
   const nextIncantRef = useRef(Infinity);
   const incantRef = useRef<Incant | null>(null);
+  const phaseStartRef = useRef(0);
+  const lastTickRef = useRef(0);
   const startRef = useRef(0);
   const wordsRef = useRef(0);
   const damageRef = useRef(0);
@@ -128,6 +131,7 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
           win,
           goldEarned: goldRef.current,
           phasesCleared: win ? BOSS_PHASES.length : phaseIdxRef.current,
+          reachedPhase: win ? BOSS_PHASES.length : phaseIdxRef.current + 1,
           totalPhases: BOSS_PHASES.length,
           damageDealt: Math.round(damageRef.current),
           wordsTyped: wordsRef.current,
@@ -146,6 +150,8 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
   // --- Boucle de jeu (rAF) ---
   useEffect(() => {
     startRef.current = now();
+    phaseStartRef.current = now();
+    lastTickRef.current = now();
     nextVolleyRef.current = now() + 1200;
     const p0 = BOSS_PHASES[0];
     nextIncantRef.current = p0.incantation ? now() + p0.incantation.everyMs : Infinity;
@@ -153,8 +159,19 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
 
     const loop = () => {
       const t0 = now();
+      const dt = Math.min(100, t0 - lastTickRef.current); // clamp (onglet en arrière-plan)
+      lastTickRef.current = t0;
       if (statusRef.current === 'fighting') {
         const phase = BOSS_PHASES[phaseIdxRef.current];
+
+        // Régénération : le boss se soigne, il faut le burst avant qu'il ne remonte.
+        if (phase.regenPerSec && bossHpRef.current < phase.maxHp) {
+          bossHpRef.current = Math.min(phase.maxHp, bossHpRef.current + (phase.regenPerSec * dt) / 1000);
+        }
+
+        // Enrage : passé un certain temps dans la phase, les salves accélèrent.
+        const enraged = phase.enrageAtMs != null && t0 - phaseStartRef.current > phase.enrageAtMs;
+        const enrageMult = enraged ? phase.enrageMult ?? 0.55 : 1;
 
         // Déclenchement d'une incantation (coup fatal).
         if (phase.incantation && !incantRef.current && t0 >= nextIncantRef.current) {
@@ -199,7 +216,7 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
               maxHp: armored ? 2 : 1,
             });
           }
-          nextVolleyRef.current = t0 + phase.volleyIntervalMs + phase.salvoSize * phase.salvoGapMs;
+          nextVolleyRef.current = t0 + phase.volleyIntervalMs * enrageMult + phase.salvoSize * phase.salvoGapMs;
         }
 
         // Avancement / collisions des projectiles.
@@ -231,9 +248,10 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
                 bossHpRef.current = np.maxHp;
                 projsRef.current = [];
                 incantRef.current = null;
+                phaseStartRef.current = t0;
                 nextVolleyRef.current = t0 + 1500;
                 nextIncantRef.current = np.incantation ? t0 + np.incantation.everyMs : Infinity;
-                bannerRef.current = { text: `${np.name} — PHASE ${phaseIdxRef.current + 1}`, until: t0 + 1800 };
+                bannerRef.current = { text: `${np.emoji} ${np.name} — PHASE ${phaseIdxRef.current + 1}`, until: t0 + 1800 };
                 phaseChanged = true;
                 break;
               } else {
@@ -406,10 +424,12 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
   const banner = bannerRef.current;
   const inc = incantRef.current;
   const incRatio = inc ? Math.max(0, (inc.deadline - t0) / inc.castMs) : 0;
+  const enraged =
+    statusRef.current === 'fighting' && phase.enrageAtMs != null && t0 - phaseStartRef.current > phase.enrageAtMs;
 
   return (
     <div className={`max-w-2xl w-full ${shake ? 'animate-shake' : ''}`}>
-      <div className="flex justify-between items-center mb-3">
+      <div className="flex justify-between items-center mb-2">
         <div className="text-sm text-gray-300">
           {t('bossPhase')} <span className="font-bold text-red-300">{phaseIdxRef.current + 1}/{BOSS_PHASES.length}</span>
         </div>
@@ -418,8 +438,23 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
         </button>
       </div>
 
+      {/* Tracker des 10 phases : franchies / en cours / à venir */}
+      <div className="flex gap-1 mb-3">
+        {BOSS_PHASES.map((_, i) => (
+          <div key={i} className="flex-1 h-1.5 rounded-full transition-colors"
+            style={{
+              background: i < phaseIdxRef.current ? '#f59e0b' : i === phaseIdxRef.current ? phase.color : 'rgba(255,255,255,0.1)',
+              boxShadow: i === phaseIdxRef.current ? `0 0 8px ${phase.color}` : 'none',
+            }} />
+        ))}
+      </div>
+
       <div className="mb-1 flex justify-between items-end">
-        <span className="text-lg font-extrabold tracking-wide" style={{ color: phase.color }}>{phase.name}</span>
+        <span className="text-lg font-extrabold tracking-wide flex items-center gap-2" style={{ color: phase.color }}>
+          <span>{phase.emoji}</span>{phase.name}
+          {phase.regenPerSec ? <span className="text-xs text-green-400" title="régénération">♻</span> : null}
+          {enraged && <span className="text-xs font-bold text-red-400 animate-pulse px-1.5 py-0.5 rounded bg-red-500/20">⚡ {t('bossEnrage')}</span>}
+        </span>
         <span className="text-xs text-gray-400">{Math.max(0, Math.ceil(bossHpRef.current))}/{phase.maxHp}</span>
       </div>
       <div className="w-full h-4 bg-gray-700/70 rounded-full overflow-hidden mb-4 ring-1 ring-white/10">
@@ -429,9 +464,9 @@ const BossArena: React.FC<BossArenaProps> = ({ deck, onEnd, onQuit }) => {
 
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-gray-900/80 to-gray-800/80 ring-1 ring-red-500/40 select-none"
         style={{ height: '46vh', minHeight: 300 }}>
-        <div className={`absolute left-1/2 -translate-x-1/2 transition-transform ${bossHitFlash ? 'scale-95' : 'scale-100'}`}
+        <div className={`absolute left-1/2 -translate-x-1/2 transition-transform ${bossHitFlash ? 'scale-95' : 'scale-100'} ${enraged ? 'boss-enraged' : ''}`}
           style={{ top: '4%' }}>
-          <div className="text-6xl" style={{ filter: bossHitFlash ? 'brightness(2)' : 'none' }}>👹</div>
+          <div className="text-6xl" style={{ filter: bossHitFlash ? 'brightness(2)' : 'none' }}>{phase.emoji}</div>
         </div>
 
         {/* Projectiles */}

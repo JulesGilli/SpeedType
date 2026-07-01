@@ -7,6 +7,7 @@ import {
   saveProgress,
   addGold,
   deckCards,
+  recordBestPhase,
   BossProgress,
 } from '../../lib/boss/bossProgress';
 import { computeWpm } from '../../utils/gameUtils';
@@ -30,6 +31,7 @@ const BossMode: React.FC<BossModeProps> = ({ onGameEnd, onStop }) => {
   const [progress, setProgressState] = useState<BossProgress>(() => loadProgress());
   const [screen, setScreen] = useState<Screen>('lobby');
   const [outcome, setOutcome] = useState<BossOutcome | null>(null);
+  const [newRecord, setNewRecord] = useState(false);
 
   // Sauvegarde à chaque mutation de progression.
   const setProgress = (p: BossProgress) => {
@@ -41,8 +43,9 @@ const BossMode: React.FC<BossModeProps> = ({ onGameEnd, onStop }) => {
 
   const handleBattleEnd = (o: BossOutcome) => {
     setOutcome(o);
-    // L'or gagné pendant le run est crédité à la progression.
-    setProgress(addGold(progress, o.goldEarned));
+    setNewRecord(o.reachedPhase > progress.bestPhase);
+    // L'or gagné est crédité + on mémorise la meilleure phase atteinte.
+    setProgress(recordBestPhase(addGold(progress, o.goldEarned), o.reachedPhase));
     setScreen('debrief');
   };
 
@@ -84,6 +87,11 @@ const BossMode: React.FC<BossModeProps> = ({ onGameEnd, onStop }) => {
       <h1 className={`text-4xl font-extrabold mb-2 text-transparent bg-clip-text ${outcome?.win ? 'bg-gradient-to-r from-yellow-400 to-orange-500' : 'bg-gradient-to-r from-red-500 to-gray-500'}`}>
         {outcome?.win ? t('bossVictory') : t('bossDefeat')}
       </h1>
+      {newRecord && !outcome?.win && (
+        <div className="text-sm font-bold text-yellow-300 mb-1 animate-pulse">
+          ⭐ {t('bossNewRecord')} — {t('bossPhase')} {outcome?.reachedPhase}/{outcome?.totalPhases}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3 my-6 text-left">
         <div className="rounded-lg bg-white/5 p-3">

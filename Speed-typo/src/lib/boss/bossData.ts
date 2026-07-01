@@ -85,6 +85,7 @@ export interface BossIncantation {
 
 export interface BossPhase {
   name: string; // nom du boss à cette phase (cosmétique, non traduit)
+  emoji: string; // visage du boss (change à chaque phase → sensation de boss-rush)
   maxHp: number;
   travelMs: number; // temps qu'un projectile met à atteindre le joueur
   damage: number; // dégâts d'un coup non paré
@@ -96,28 +97,52 @@ export interface BossPhase {
   volleyIntervalMs: number; // délai entre deux salves
   shieldedChance: number; // proba qu'un projectile soit blindé (à parer 2 fois)
   incantation?: BossIncantation; // coup fatal à contrer en tapant une incantation
+  regenPerSec?: number; // le boss se régénère (DPS check : il faut burst)
+  enrageAtMs?: number; // au bout de ce temps dans la phase, le boss s'enrage
+  enrageMult?: number; // multiplicateur d'intervalle une fois enragé (<1 = plus rapide)
 }
 
+// 10 phases = un vrai boss-rush. La difficulté monte ET de nouvelles mécaniques
+// s'ajoutent progressivement (salves → blindés → incantations → régénération → enrage).
 export const BOSS_PHASES: BossPhase[] = [
-  // Phase 1 — tirs simples, le temps de prendre ses marques.
-  {
-    name: 'GLOUBON', maxHp: 120, travelMs: 3100, damage: 12, color: '#38bdf8', goldReward: 60,
-    salvoSize: 1, salvoGapMs: 0, volleyIntervalMs: 2600, shieldedChance: 0,
-  },
-  // Phase 2 — salves de mots + quelques mots blindés.
-  {
-    name: 'KRAEL', maxHp: 200, travelMs: 2900, damage: 14, color: '#c084fc', goldReward: 110,
-    salvoSize: 3, salvoGapMs: 280, volleyIntervalMs: 3700, shieldedChance: 0.25,
-  },
-  // Phase 3 — grosses salves, blindés fréquents et incantations fatales.
-  {
-    name: 'NOXAR', maxHp: 300, travelMs: 2500, damage: 16, color: '#ef4444', goldReward: 200,
-    salvoSize: 4, salvoGapMs: 240, volleyIntervalMs: 4300, shieldedChance: 0.34,
-    incantation: { everyMs: 11000, castMs: 3600, damage: 999 },
-  },
+  // 1 — Tuto : tirs simples.
+  { name: 'GLOUBON', emoji: '👹', maxHp: 110, travelMs: 3100, damage: 10, color: '#38bdf8', goldReward: 55,
+    salvoSize: 1, salvoGapMs: 0, volleyIntervalMs: 2600, shieldedChance: 0 },
+  // 2 — Petites salves.
+  { name: 'KRAEL', emoji: '👺', maxHp: 150, travelMs: 2900, damage: 12, color: '#a78bfa', goldReward: 75,
+    salvoSize: 2, salvoGapMs: 300, volleyIntervalMs: 3200, shieldedChance: 0.15 },
+  // 3 — Premiers blindés.
+  { name: 'VIRUX', emoji: '🦠', maxHp: 200, travelMs: 2800, damage: 13, color: '#4ade80', goldReward: 100,
+    salvoSize: 3, salvoGapMs: 280, volleyIntervalMs: 3400, shieldedChance: 0.3 },
+  // 4 — Salves lourdes, beaucoup de blindés.
+  { name: 'SPHINX', emoji: '🗿', maxHp: 260, travelMs: 2700, damage: 15, color: '#f59e0b', goldReward: 130,
+    salvoSize: 3, salvoGapMs: 260, volleyIntervalMs: 3200, shieldedChance: 0.4 },
+  // 5 — Première incantation fatale (jalon).
+  { name: 'MORDRAK', emoji: '🐉', maxHp: 330, travelMs: 2600, damage: 16, color: '#ef4444', goldReward: 190,
+    salvoSize: 4, salvoGapMs: 240, volleyIntervalMs: 3600, shieldedChance: 0.35,
+    incantation: { everyMs: 12000, castMs: 3600, damage: 999 } },
+  // 6 — Régénération : il faut burst.
+  { name: 'NECROSS', emoji: '💀', maxHp: 410, travelMs: 2500, damage: 18, color: '#a855f7', goldReward: 210,
+    salvoSize: 4, salvoGapMs: 240, volleyIntervalMs: 3400, shieldedChance: 0.4, regenPerSec: 5 },
+  // 7 — Enrage : accélère si tu traînes.
+  { name: 'TEMPESTA', emoji: '🌪️', maxHp: 500, travelMs: 2400, damage: 19, color: '#22d3ee', goldReward: 250,
+    salvoSize: 4, salvoGapMs: 220, volleyIntervalMs: 3200, shieldedChance: 0.4, enrageAtMs: 9000, enrageMult: 0.55 },
+  // 8 — Incantations rapprochées + grosses salves blindées.
+  { name: 'OBLIVYX', emoji: '🌀', maxHp: 610, travelMs: 2300, damage: 21, color: '#6366f1', goldReward: 305,
+    salvoSize: 5, salvoGapMs: 200, volleyIntervalMs: 3400, shieldedChance: 0.45,
+    incantation: { everyMs: 10000, castMs: 3300, damage: 999 } },
+  // 9 — Régén + enrage + incantation : mur.
+  { name: 'VOIDLORD', emoji: '👾', maxHp: 740, travelMs: 2200, damage: 23, color: '#d946ef', goldReward: 370,
+    salvoSize: 5, salvoGapMs: 200, volleyIntervalMs: 3200, shieldedChance: 0.45, regenPerSec: 6,
+    enrageAtMs: 10000, enrageMult: 0.6, incantation: { everyMs: 11000, castMs: 3300, damage: 999 } },
+  // 10 — OMEGA : tout à la fois. Le sommet.
+  { name: 'OMEGA', emoji: '🔱', maxHp: 900, travelMs: 2100, damage: 26, color: '#fbbf24', goldReward: 600,
+    salvoSize: 6, salvoGapMs: 180, volleyIntervalMs: 3200, shieldedChance: 0.5, regenPerSec: 6,
+    enrageAtMs: 9000, enrageMult: 0.55, incantation: { everyMs: 9000, castMs: 3000, damage: 999 } },
 ];
 
-export const WIN_BONUS_GOLD = 200;
+export const TOTAL_PHASES = BOSS_PHASES.length;
+export const WIN_BONUS_GOLD = 500;
 export const PLAYER_MAX_HP = 100;
 
 // Or gagné par point de dégât infligé à une phase non terminée (consolation en cas de défaite).
