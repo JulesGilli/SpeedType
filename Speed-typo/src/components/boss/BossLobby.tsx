@@ -26,6 +26,17 @@ interface BossLobbyProps {
   onBack: () => void;
 }
 
+// Points du tuto (icône + clés i18n `<key>T` titre / `<key>D` description).
+const TUTO = [
+  { key: 'bossTutAttack', icon: '⚔️' },
+  { key: 'bossTutDefense', icon: '🛡️' },
+  { key: 'bossTutName', icon: '💥' },
+  { key: 'bossTutSpell', icon: '✨' },
+  { key: 'bossTutIncant', icon: '☠️' },
+  { key: 'bossTutGold', icon: '🪙' },
+  { key: 'bossTutPhases', icon: '🔟' },
+];
+
 const kindIcon = (c: CardDef) =>
   c.kind === 'attack' ? '⚔' : c.kind === 'defense' ? (c.defense === 'shield' ? '🛡' : '✋') : c.spell === 'heal' ? '✚' : '⚡';
 
@@ -33,6 +44,8 @@ const BossLobby: React.FC<BossLobbyProps> = ({ progress, setProgress, onFight, o
   const { t } = useI18n();
   const [reveal, setReveal] = useState<{ card: CardDef; isNew: boolean } | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
+  // Tuto déplié d'office pour un nouveau joueur (jamais atteint de phase).
+  const [showTut, setShowTut] = useState(progress.bestPhase === 0);
 
   const owned = progress.owned;
   const ownedIds = Object.keys(owned);
@@ -89,6 +102,28 @@ const BossLobby: React.FC<BossLobbyProps> = ({ progress, setProgress, onFight, o
           ))}
         </div>
         <span className="text-xs font-bold text-orange-300 whitespace-nowrap">{progress.bestPhase}/{TOTAL_PHASES}</span>
+      </div>
+
+      {/* Tuto : comment jouer (mécaniques du mode Boss) */}
+      <div className="mb-4">
+        <button onClick={() => setShowTut((v) => !v)}
+          className="w-full flex items-center justify-between px-4 py-2 rounded-xl bg-red-500/5 border border-red-500/20 hover:bg-red-500/10 text-sm transition-colors">
+          <span className="font-semibold text-red-200">❓ {t('bossHowTo')}</span>
+          <span className={`text-red-300 transition-transform ${showTut ? 'rotate-180' : ''}`}>▾</span>
+        </button>
+        {showTut && (
+          <div className="mt-2 rounded-xl bg-black/30 border border-red-500/20 p-3 space-y-2.5">
+            {TUTO.map((it) => (
+              <div key={it.key} className="flex gap-2.5">
+                <span className="text-lg shrink-0 w-6 text-center">{it.icon}</span>
+                <div>
+                  <div className="text-sm font-semibold text-red-200">{t(`${it.key}T`)}</div>
+                  <div className="text-xs text-gray-300 leading-snug">{t(`${it.key}D`)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {flash && <div className="mb-3 text-center text-sm text-red-300">{flash}</div>}

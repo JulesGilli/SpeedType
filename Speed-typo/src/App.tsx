@@ -123,6 +123,9 @@ function App() {
   // Retour après une partie : menu Hardcore si on y est, sinon accueil.
   const afterGame = () => setGameState(hardcore ? 'hardcore' : 'start');
 
+  // Relance directe du même mode (bouton "Rejouer" / touche Entrée sur l'écran de résultat).
+  const replayGame = () => startGame(playMode);
+
   const exitHardcore = () => {
     setHardcore(false);
     setGameState('start');
@@ -181,6 +184,7 @@ function App() {
                     claimed={claimed}
                     hardcore={hardcore}
                     onRestart={afterGame}
+                    onReplay={replayGame}
                   />
                 </motion.div>
               )}

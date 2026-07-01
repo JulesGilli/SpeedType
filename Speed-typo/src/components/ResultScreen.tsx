@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { GameResult } from '../types/GameResult';
 import { SaveStatus } from '../App';
 import { ClaimedChallenge } from '../lib/challenges';
@@ -7,7 +8,8 @@ interface ResultScreenProps {
   result: GameResult;
   saveStatus: SaveStatus;
   claimed: ClaimedChallenge[];
-  onRestart: () => void;
+  onRestart: () => void; // "Retour" : revient au menu
+  onReplay: () => void; // "Rejouer" : relance directement le même mode
   hardcore?: boolean;
 }
 
@@ -19,9 +21,23 @@ const SAVE_KEY: Record<SaveStatus, { key: string; className: string } | null> = 
   anon: { key: 'saveAnon', className: 'text-yellow-400' },
 };
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed, onRestart, hardcore = false }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed, onRestart, onReplay, hardcore = false }) => {
   const { score, wordCount, accuracy, wpm } = result;
   const { t, challengeTitle } = useI18n();
+
+  // Touche Entrée = relance directe (sauf si on est en train de taper dans un champ,
+  // ex. le champion qui édite son message).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter') return;
+      const el = document.activeElement;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return;
+      e.preventDefault();
+      onReplay();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onReplay]);
   const gradient = hardcore ? 'from-red-500 to-orange-500' : 'from-purple-400 to-pink-600';
   const btnGradient = hardcore
     ? 'from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700'
@@ -83,12 +99,25 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ result, saveStatus, claimed
         </div>
       )}
 
-      <button
-        onClick={onRestart}
-        className={`px-8 py-3 bg-gradient-to-r ${btnGradient} rounded-lg text-lg font-bold transform transition-all hover:scale-105 shadow-lg`}
-      >
-        {t('playAgain')}
-      </button>
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={onReplay}
+            className={`px-8 py-3 bg-gradient-to-r ${btnGradient} rounded-lg text-lg font-bold transform transition-all hover:scale-105 shadow-lg`}
+          >
+            {t('playAgain')}
+          </button>
+          <button
+            onClick={onRestart}
+            className="px-6 py-3 rounded-lg text-lg font-semibold bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+          >
+            {t('back')}
+          </button>
+        </div>
+        <div className="text-xs text-gray-500">
+          <kbd className="px-1.5 py-0.5 rounded bg-white/10 border border-white/15 text-gray-300">↵ Entrée</kbd> {t('replayHint')}
+        </div>
+      </div>
     </div>
   );
 };
